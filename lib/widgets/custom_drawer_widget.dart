@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pos_app/constatnts/colors.dart';
 import 'package:pos_app/constatnts/styles.dart';
 
@@ -10,14 +11,14 @@ class CustomDrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<DrawerButton> drawerButtons = [
-      DrawerButton(icon: Icons.home, title: "Opening Balance"),
-      DrawerButton(icon: Icons.home, title: "CRM"),
-      DrawerButton(icon: Icons.home, title: "Sale Window"),
-      DrawerButton(icon: Icons.home, title: "Recent Sales"),
-      DrawerButton(icon: Icons.home, title: "Credit Sales"),
-      DrawerButton(icon: Icons.home, title: "Day Closing"),
-      DrawerButton(icon: Icons.home, title: "Expense"),
-      DrawerButton(icon: Icons.home, title: "Pay Back"),
+      DrawerButton(icon: "assets/images/svg/openingbal.svg", title: "Opening Balance"),
+      DrawerButton(icon: "assets/images/svg/CRM.svg", title: "CRM"),
+      DrawerButton(icon: "assets/images/svg/sale.svg", title: "Sale Window"),
+      DrawerButton(icon: "assets/images/svg/report.svg", title: "Recent Sales"),
+      DrawerButton(icon: "assets/images/svg/credit.svg", title: "Credit Sales"),
+      DrawerButton(icon: "assets/images/svg/units.svg", title: "Day Closing"),
+      DrawerButton(icon: "assets/images/svg/expenses.svg", title: "Expense"),
+      DrawerButton(icon: "assets/images/svg/performance_report.svg", title: "Pay Back"),
     ];
     return Container(
       width: MediaQuery.sizeOf(context).width / 1.5,
@@ -27,8 +28,26 @@ class CustomDrawerWidget extends StatelessWidget {
             topRight: Radius.circular(15),
             bottomRight: Radius.circular(15),
           )),
-      padding: EdgeInsets.only(top: 84, left: 14, right: 14, bottom: 14),
+      padding: EdgeInsets.only(top: 28, left: 14, right: 14, bottom: 14),
       child: Column(children: [
+        Hero(
+          tag: 'assets/images/png/logo.png',
+          child: Padding(
+            padding: const EdgeInsets.all(7.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Image.asset(
+                height: 45,
+                width: 45,
+                'assets/images/png/logo.png',
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 30),
         ...drawerButtons.asMap().entries.map((e) => InkWell(
               onTap: () {
                 onClick(e.key);
@@ -43,7 +62,12 @@ class CustomDrawerWidget extends StatelessWidget {
                 child: Center(
                   child: Row(
                     children: [
-                      Icon(color: e.key == index ? Colors.white : null, e.value.icon),
+                      SvgPicture.asset(
+                        e.value.icon,
+                        height: 30,
+                        color: e.key == index ? Colors.white : AppColors.textColor,
+                        width: 30,
+                      ),
                       SizedBox(width: 18),
                       Text(
                         e.value.title,
@@ -81,7 +105,7 @@ class CustomDrawerWidget extends StatelessWidget {
 
 class DrawerButton {
   String title;
-  IconData icon;
+  String icon;
   Widget? navigateTo;
   DrawerButton({
     required this.title,

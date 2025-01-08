@@ -1,96 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/colors.dart';
 import 'package:pos_app/constatnts/styles.dart';
-import 'package:pos_app/presentation/screens/cart.dart';
+import 'package:pos_app/data/models/customer_model.dart';
+import 'package:pos_app/data/utils/extensions.dart';
+import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
+import 'package:pos_app/widgets/auto_complete_textfield.dart';
 import 'package:pos_app/widgets/custom_textfield.dart';
+import 'package:pos_app/widgets/customer_card.dart';
 
-class CrmScreen extends StatelessWidget {
+class CrmScreen extends StatefulWidget {
   const CrmScreen({super.key});
 
   @override
+  State<CrmScreen> createState() => _CrmScreenState();
+}
+
+class _CrmScreenState extends State<CrmScreen> {
+  final CrmBloc _crmBloc = CrmBloc();
+  @override
+  void initState() {
+    super.initState();
+    _crmBloc.add(GetAllCustomersEvent());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        padding: EdgeInsets.all(14),
-        children: [
-          DropdownButtonFormField<String>(
-            hint: Text("Select Customer"),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+    return BlocConsumer<CrmBloc, CrmState>(
+      bloc: _crmBloc,
+      listener: (context, state) {},
+      builder: (context, state) {
+        if (state is CrmScreenLoadingSuccessState) {
+          return Scaffold(
+            body: ListView(
+              padding: EdgeInsets.all(14),
+              children: [
+                AutoCompleteTextField<CustomerModel>(
+                  items: state.customersList,
+                  displayStringFunction: (v) {
+                    return v.customerName ?? "";
+                  },
+                  searchFunction: (customer) => [
+                    customer.mobileNumber ?? "",
+                    customer.customerName ?? "",
+                    customer.email ?? "",
+                  ],
+                  onSelected: (customer) {
+                    _crmBloc.add(SelectCustomerEvent(selectedCustomer: customer));
+                  },
+                  onChanged: (value) {
+                    _crmBloc.add(SearchCustomersEvent(searchQuery: value));
+                  },
+                  defaultText: "Search Customer",
+                  labelText: "Search Customer",
+                ),
+                SizedBox(height: 15),
+                if (state.customersList.isEmpty)
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).width / 1,
+                    child: Center(
+                      child: Text('No Customers Found'),
+                    ),
+                  )
+                else
+                  ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: state.filteredCustomersList.length,
+                    itemBuilder: (c, i) {
+                      return CustomerCard(customerModel: state.customersList[i]);
+                    },
+                  ),
+              ],
+            ),
+            bottomNavigationBar: Container(
+              padding: EdgeInsets.all(10),
+              height: 70,
+              child: ElevatedButton(
+                onPressed: () => showCustomerCreationSheet(context),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    )),
+                child: Text("Create Customer"),
               ),
             ),
-            icon: Icon(Icons.keyboard_arrow_down_sharp),
-            items: [
-              DropdownMenuItem(
-                value: "0",
-                child: Text("All"),
-              ),
-              DropdownMenuItem(
-                value: "2",
-                child: Text("12345678900 - Sooraj"),
-              ),
-              DropdownMenuItem(
-                value: "4",
-                child: Text("94627817378 - fwe"),
-              ),
-            ],
-            onChanged: (v) {},
-          ),
-          SizedBox(height: 15),
-          ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: 10,
-            itemBuilder: (c, i) {
-              return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  color: Colors.white,
-                  surfaceTintColor: Colors.transparent,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        buildLabel("Faheem", "09837483679"),
-                        SizedBox(height: 10),
-                        buildLabel("Purchased Amount", "\$10000"),
-                        SizedBox(height: 10),
-                        buildLabel("Purchased Unit", "300"),
-                      ],
-                    ),
-                  ));
-            },
-          ),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(10),
-        height: 70,
-        child: ElevatedButton(
-          onPressed: () => showCustomerCreationSheet(context),
-          style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              )),
-          child: Text("Create Customer"),
-        ),
-      ),
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
-
-    // floatingActionButton: FloatingActionButton(
-    //   onPressed: () => context.pushNamed(CartView.route),
-    //   shape: const CircleBorder(),
-    //   backgroundColor: AppColors.primaryColor,
-    //   child: SvgPicture.asset('assets/images/svg/cart.svg'),
-    // ),
   }
 
   Row buildLabel(String title, String data) {
@@ -116,90 +122,146 @@ class CrmScreen extends StatelessWidget {
     );
   }
 
-  showCustomerCreationSheet(BuildContext context) {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController numberController = TextEditingController();
-    TextEditingController adddressController = TextEditingController();
-    return showDialog(
+  void showCustomerCreationSheet(BuildContext context) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController numberController = TextEditingController();
+    final TextEditingController addressController = TextEditingController();
+    final GlobalKey<FormState> formKey = GlobalKey();
+    String? selectedGender;
+    showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
-      builder: (c) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Create Customer",
-              style: AppStyles.getMediumTextStyle(fontSize: 12),
+      builder: (context) => BlocListener<CrmBloc, CrmState>(
+        bloc: _crmBloc,
+        listener: (context, state) {
+          if (state is CrmScreenLoadingState) {
+            FocusScope.of(context).unfocus();
+            context.pop();
+          }
+        },
+        child: PopScope(
+          onPopInvoked: (d) {
+            FocusScope.of(context).unfocus();
+          },
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            SizedBox(height: 14),
-            CustomTextField(
-              hint: "Name",
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
-              validator: (value) {},
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor)),
-              controller: nameController,
-            ),
-            SizedBox(height: 14),
-            CustomTextField(
-              hint: "Email",
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {},
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor)),
-              controller: emailController,
-            ),
-            SizedBox(height: 14),
-            CustomTextField(
-              hint: "Number",
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
-              validator: (value) {},
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor)),
-              controller: numberController,
-            ),
-            SizedBox(height: 14),
-            CustomTextField(
-              hint: "Address",
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.streetAddress,
-              validator: (value) {},
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor)),
-              controller: adddressController,
-            ),
-            SizedBox(height: 14),
-            DropdownButtonFormField<String>(
-              hint: Text("Gender"),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              child: Form(
+                key: formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: const ClampingScrollPhysics(),
+                  children: [
+                    Text(
+                      "Create Customer",
+                      style: AppStyles.getMediumTextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextField(
+                      labelText: "Name",
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a name';
+                        }
+                        return null;
+                      },
+                      fillColor: Colors.transparent,
+                      controller: nameController,
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextField(
+                      labelText: "Email",
+                      keyBoardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an email';
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
+                      },
+                      fillColor: Colors.transparent,
+                      controller: emailController,
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextField(
+                      labelText: "Phone Number",
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      keyBoardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a phone number';
+                        }
+                        if (value.length < 10) {
+                          return 'Please enter a valid phone number';
+                        }
+                        return null;
+                      },
+                      fillColor: Colors.transparent,
+                      controller: numberController,
+                    ),
+                    const SizedBox(height: 14),
+                    CustomTextField(
+                      labelText: "Address",
+                      keyBoardType: TextInputType.streetAddress,
+                      maxLines: 2,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an address';
+                        }
+                        return null;
+                      },
+                      fillColor: Colors.transparent,
+                      controller: addressController,
+                    ),
+                    const SizedBox(height: 14),
+                    AutoCompleteTextField<String>(
+                      disableSearch: true,
+                      labelText: "Select Gender",
+                      showAsUpperLabel: true,
+                      optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                      items: ["Male", "Female"],
+                      displayStringFunction: (v) {
+                        return v;
+                      },
+                      onSelected: (v) {
+                        selectedGender = v;
+                      },
+                      validator: (v) {
+                        if (v.isNullOrEmpty()) {
+                          return "Select gender";
+                        }
+                        return null;
+                      },
+                      defaultText: "Gender",
+                    ),
+                    const SizedBox(height: 14),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          CustomerModel customer = CustomerModel(
+                            address: addressController.text,
+                            customerName: nameController.text,
+                            email: emailController.text,
+                            gender: selectedGender.toString(),
+                            mobileNumber: numberController.text,
+                          );
+                          _crmBloc.add(AddCustomerEvent(customer: customer));
+                        }
+                      },
+                      style: AppStyles.filledButton,
+                      child: const Text("Create"),
+                    ),
+                  ],
                 ),
               ),
-              icon: Icon(Icons.keyboard_arrow_down_sharp),
-              items: [
-                DropdownMenuItem(
-                  value: "0",
-                  child: Text("Male"),
-                ),
-                DropdownMenuItem(
-                  value: "2",
-                  child: Text("Female"),
-                ),
-              ],
-              onChanged: (v) {},
             ),
-            SizedBox(height: 14),
-            ElevatedButton(
-              onPressed: () {},
-              child: Text(
-                "Create",
-              ),
-              style: AppStyles.filledButton,
-            ),
-          ],
+          ),
         ),
       ),
     );

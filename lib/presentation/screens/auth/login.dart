@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pos_app/constatnts/colors.dart';
 
 import '../../../../constatnts/styles.dart';
 import '../../../../widgets/custom_textfield.dart';
@@ -13,6 +14,7 @@ class LoginScreen extends StatelessWidget {
     final TextEditingController userNameController = TextEditingController();
     final TextEditingController passWordController = TextEditingController();
     return Scaffold(
+      backgroundColor: AppColors.primaryColor,
       body: ListView(
         children: [
           SizedBox(
@@ -47,15 +49,7 @@ class LoginScreen extends StatelessWidget {
                   child: CustomTextField(
                     controller: userNameController,
                     fillColor: Colors.white,
-                    hint: 'UserName',
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
+                    labelText: 'UserName',
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -67,16 +61,8 @@ class LoginScreen extends StatelessWidget {
                   child: CustomTextField(
                     controller: passWordController,
                     fillColor: Colors.white,
-                    hint: 'Password',
+                    labelText: 'Password',
                     obscureText: true,
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
                   ),
                 ),
                 const SizedBox(height: 20),

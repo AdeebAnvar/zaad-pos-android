@@ -247,15 +247,7 @@ class _CartViewState extends State<CartView> {
                               child: CustomTextField(
                                 controller: cashController,
                                 fillColor: Colors.white,
-                                hint: 'Cash',
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
+                                labelText: 'Cash',
                               ),
                             )
                           else if (paymentModes[index] == 'CARD')
@@ -267,15 +259,7 @@ class _CartViewState extends State<CartView> {
                               child: CustomTextField(
                                 controller: cardController,
                                 fillColor: Colors.white,
-                                hint: 'Card',
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
+                                labelText: 'Card',
                               ),
                             )
                           else if (paymentModes[index] == 'SPLIT')
@@ -290,15 +274,7 @@ class _CartViewState extends State<CartView> {
                                     child: CustomTextField(
                                       controller: splitBillingCashController,
                                       fillColor: Colors.white,
-                                      hint: 'Cash',
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide.none,
-                                      ),
+                                      labelText: 'Cash',
                                     ),
                                   ),
                                 ),
@@ -312,15 +288,7 @@ class _CartViewState extends State<CartView> {
                                     child: CustomTextField(
                                       controller: splitBillingCardController,
                                       fillColor: Colors.white,
-                                      hint: 'Card',
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide.none,
-                                      ),
+                                      labelText: 'Card',
                                     ),
                                   ),
                                 ),
@@ -344,15 +312,7 @@ class _CartViewState extends State<CartView> {
                               child: CustomTextField(
                                 controller: customerPhoneController,
                                 fillColor: Colors.white,
-                                hint: 'Contact number',
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
+                                labelText: 'Contact number',
                               ),
                             ),
                           ),
@@ -367,15 +327,7 @@ class _CartViewState extends State<CartView> {
                               child: CustomTextField(
                                 controller: customerNameController,
                                 fillColor: Colors.white,
-                                hint: 'Customer name',
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
+                                labelText: 'Customer name',
                               ),
                             ),
                           ),

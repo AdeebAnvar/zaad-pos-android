@@ -1,141 +1,223 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../constatnts/colors.dart';
+import 'package:pos_app/constatnts/colors.dart';
+import 'package:pos_app/constatnts/styles.dart';
+import 'package:pos_app/data/utils/extensions.dart';
 
 class CustomTextField extends StatefulWidget {
   const CustomTextField(
       {super.key,
-      required this.controller,
-      this.hint,
-      this.textAlign,
+      this.controller,
+      // this.hintText,
+      this.hintFontSize,
+      this.labelText,
+      this.showAsUpperLabel,
+      this.margin,
+      this.textInputAction,
+      this.focusNode,
       this.onChanged,
-      this.validator,
-      this.focusedBorder,
-      this.border,
-      this.textSize,
       this.obscureText = false,
-      this.maxLines = 1,
-      this.inputAction,
-      this.inputFormatters,
-      this.keyboardType,
-      this.textCapitalization,
-      this.maxLength,
-      this.style,
-      this.label,
-      this.errorStyle,
-      this.fillColor,
-      this.onFieldSubmitted,
-      this.prefix,
-      this.padding,
-      this.labelStyle,
       this.onTap,
+      this.onSubmitted,
+      this.keyBoardType,
+      this.textCapitalization = TextCapitalization.none,
+      this.errorText,
+      this.changeColor,
+      this.fillColor,
+      this.readOnly = false,
+      this.enabled = true,
+      this.autofillHints,
+      this.onIconTap,
+      this.suffixIcon,
       this.suffix,
-      this.focusNode});
-  final TextEditingController controller;
-  final String? hint;
-  final double? textSize;
-  final TextAlign? textAlign;
-  final Function(String value)? onChanged;
-  final Function()? onTap;
-
-  final Function(String value)? onFieldSubmitted;
-  final String? Function(String? value)? validator;
-  final EdgeInsets? padding;
-  final InputBorder? focusedBorder;
-  final InputBorder? border;
-  final int? maxLines;
-  final bool obscureText;
-  final TextInputAction? inputAction;
-  final List<TextInputFormatter>? inputFormatters;
-  final TextInputType? keyboardType;
-  final TextCapitalization? textCapitalization;
-  final TextStyle? style;
-  final TextStyle? labelStyle;
-  final FocusNode? focusNode;
-  final String? label;
-  final int? maxLength;
-  final TextStyle? errorStyle;
+      this.validator,
+      this.maxLength,
+      this.inputFormatters,
+      this.textColor,
+      this.maxLines = 1,
+      this.minLines = 1,
+      this.counterText,
+      this.textAlign,
+      this.prefixIcon,
+      this.prefix,
+      this.contentPadding});
+  final TextEditingController? controller;
+  final EdgeInsetsGeometry? margin;
+  final TextInputAction? textInputAction;
+  // final String? hintText;
+  final double? hintFontSize;
+  final String? labelText;
+  final bool? showAsUpperLabel;
+  final String? counterText;
   final Color? fillColor;
-  final Widget? prefix;
+  final FocusNode? focusNode;
+  final bool? obscureText;
+  final void Function(String value)? onChanged;
+  final void Function(String value)? onSubmitted;
+  final void Function()? onTap;
+  final TextInputType? keyBoardType;
+  final TextCapitalization textCapitalization;
+  final String? errorText;
+  final bool? changeColor;
+  final bool? readOnly;
+  final bool? enabled;
+  final Iterable<String>? autofillHints;
+  final void Function()? onIconTap;
+  final Widget? suffixIcon;
   final Widget? suffix;
+  final Widget? prefixIcon;
+  final Widget? prefix;
+  final String? Function(String? value)? validator;
+  final int? maxLength;
+  final Color? textColor;
+  final int? maxLines;
+  final int? minLines;
+  final TextAlign? textAlign;
+  final List<TextInputFormatter>? inputFormatters;
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
-  bool obscureText = false;
+  late final FocusNode _focusNode;
+  late final TextEditingController _controller;
+
   @override
   void initState() {
     super.initState();
-    obscureText = widget.obscureText;
+    _focusNode = widget.focusNode ?? FocusNode();
+    _controller = widget.controller ?? TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // Only dispose if we created the focus node
+    if (widget.focusNode == null) {
+      _focusNode.dispose();
+    }
+    // Only dispose if we created the controller
+    if (widget.controller == null) {
+      _controller.dispose();
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      focusNode: widget.focusNode,
-      textCapitalization: widget.textCapitalization ?? TextCapitalization.none,
-      obscureText: obscureText,
-      readOnly: widget.onTap != null,
-      keyboardType: widget.keyboardType,
-      maxLines: widget.maxLines,
-      controller: widget.controller,
-      inputFormatters: widget.inputFormatters,
-      textInputAction: widget.inputAction,
-      decoration: InputDecoration(
-        errorMaxLines: 5,
-        contentPadding: widget.padding ?? const EdgeInsets.symmetric(vertical: 20, horizontal: 19),
-        hintText: widget.hint,
-        fillColor: widget.fillColor ?? AppColors.textColor,
-        filled: true,
-        hintStyle: TextStyle(fontSize: widget.textSize ?? 14, fontWeight: FontWeight.w400, color: Colors.grey),
-        border: widget.border ??
-            OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.textColor),
-              borderRadius: BorderRadius.circular(10),
-            ),
-        enabledBorder: widget.border ??
-            OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.textColor),
-              borderRadius: BorderRadius.circular(10),
-            ),
-        focusedBorder: widget.focusedBorder ??
-            OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.textColor),
-              borderRadius: BorderRadius.circular(10),
-            ),
-        labelText: widget.label,
-        labelStyle: widget.labelStyle ?? TextStyle(fontSize: widget.textSize ?? 14, color: Colors.white),
-        errorStyle: widget.errorStyle,
-        prefixIcon: widget.prefix,
-        suffixIcon: widget.suffix ??
-            (widget.obscureText
-                ? Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: IconButton(
-                      onPressed: () {
-                        obscureText = !obscureText;
-                        setState(() {});
-                      },
-                      icon: Icon(
-                        obscureText ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.grey,
-                        size: widget.textSize != null ? widget.textSize! + 10 : 20,
+    return SizedBox(
+      child: Container(
+        // height: 55,//if set fixed height multi line text overflow
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+        child: ValueListenableBuilder<TextEditingValue>(
+            valueListenable: widget.controller!,
+            builder: (context, value, child) {
+              return IntrinsicHeight(
+                  // Added to maintain consistent height
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch, // Makes children stretch to match height
+                      children: [
+                    if (widget.prefixIcon != null)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Center(child: widget.prefixIcon!),
+                      ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if ((widget.showAsUpperLabel ?? true) && !widget.labelText.isNullOrEmpty() && !value.text.isNullOrEmpty())
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10.0, top: 5),
+                              child: Text(
+                                widget.labelText ?? "",
+                                textAlign: TextAlign.start,
+                                style: AppStyles.getMediumTextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                          // if(value.text.isNullOrEmpty())
+                          // const SizedBox(
+                          //   height: 10,
+                          // ),
+                          TextFormField(
+                            autofillHints: widget.autofillHints,
+                            enabled: widget.enabled,
+                            readOnly: widget.readOnly!,
+                            controller: _controller,
+                            focusNode: _focusNode,
+                            textInputAction: widget.textInputAction,
+                            obscureText: widget.obscureText!,
+                            inputFormatters: widget.inputFormatters,
+                            onChanged: widget.onChanged,
+                            onFieldSubmitted: widget.onSubmitted,
+                            maxLines: widget.maxLines,
+                            minLines: widget.minLines,
+                            onTap: widget.onTap,
+                            keyboardType: widget.keyBoardType,
+                            textCapitalization: widget.textCapitalization,
+                            cursorColor: Colors.grey.shade400,
+                            style: AppStyles.getMediumTextStyle(fontSize: 14),
+                            textAlign: widget.textAlign ?? TextAlign.start,
+                            decoration: InputDecoration(
+                              labelStyle: AppStyles.getRegularTextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: widget.hintFontSize ?? 14,
+                              ),
+                              // suffixIconConstraints: const BoxConstraints(minWidth: 30),
+                              filled: false,
+                              hintText: widget.labelText,
+
+                              counterText: widget.counterText,
+                              fillColor: widget.fillColor ?? Colors.white,
+                              // fillColor: AppColors.white,
+
+                              hintStyle: AppStyles.getRegularTextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: widget.hintFontSize ?? 14,
+                              ),
+                              isDense: true,
+                              isCollapsed: true,
+                              contentPadding: widget.contentPadding ??
+                                  EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: (value.text.isNullOrEmpty())
+                                          ? 15
+                                          : (widget.showAsUpperLabel ?? true)
+                                              ? 4
+                                              : 15),
+                              // suffixIcon: suffixIcon,
+                              suffix: widget.suffix,
+                              // prefixIcon: prefixIcon,
+                              prefix: widget.prefix,
+                              errorText: widget.errorText,
+                              errorStyle: const TextStyle(
+                                fontSize: 10,
+                                fontFamily: "Inter",
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                            validator: widget.validator,
+                            maxLength: widget.maxLength,
+                          ),
+                        ],
                       ),
                     ),
-                  )
-                : null),
+                    if (widget.suffixIcon != null)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8, right: 5),
+                        child: Center(child: widget.suffixIcon!),
+                      ),
+                  ]));
+            }),
       ),
-      textAlign: widget.textAlign ?? TextAlign.start,
-      onChanged: widget.onChanged,
-      onFieldSubmitted: widget.onFieldSubmitted,
-      cursorColor: Colors.black,
-      validator: widget.validator,
-      onTap: widget.onTap,
-      maxLength: widget.maxLength,
-      style: widget.style ?? TextStyle(fontSize: widget.textSize ?? 16, color: Colors.black),
     );
   }
 }
