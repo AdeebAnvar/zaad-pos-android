@@ -45,7 +45,7 @@ class CustomerModel {
       address: map['address'] as String,
       latestOrders: map['latestOrders'] != null
           ? List<OrderModel>.from(
-              (map['latestOrders'] as List<int>).map<OrderModel>(
+              (map['latestOrders'] as List<dynamic>).map<OrderModel>(
                 (x) => OrderModel.fromMap(x as Map<String, dynamic>),
               ),
             )

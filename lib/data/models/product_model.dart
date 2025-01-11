@@ -3,14 +3,14 @@ import 'dart:convert';
 class ProductModel {
   int id;
   String name;
-  String category;
+  int categoryId;
   int unitPrice;
   int discountPrice;
 
   ProductModel({
     required this.id,
     required this.name,
-    required this.category,
+    required this.categoryId,
     required this.unitPrice,
     required this.discountPrice,
   });
@@ -19,7 +19,7 @@ class ProductModel {
     return <String, dynamic>{
       'id': id,
       'name': name,
-      'category': category,
+      'category': categoryId,
       'unitPrice': unitPrice,
       'discountPrice': discountPrice,
     };
@@ -29,7 +29,7 @@ class ProductModel {
     return ProductModel(
       id: map['id'] as int? ?? 0,
       name: map['name'] as String? ?? '',
-      category: map['category'] as String? ?? '',
+      categoryId: map['category'] as int? ?? 0,
       unitPrice: map['unitPrice'] as int? ?? 0,
       discountPrice: map['discountPrice'] as int? ?? 0,
     );

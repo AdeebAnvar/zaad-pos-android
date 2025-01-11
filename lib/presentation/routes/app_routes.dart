@@ -21,12 +21,12 @@ GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: HomeScreen.route,
-      name: HomeScreen.route,
+      path: DashBoardScreen.route,
+      name: DashBoardScreen.route,
       pageBuilder: (BuildContext context, GoRouterState state) {
         return getCustomTransition(
           state,
-          const HomeScreen(),
+          const DashBoardScreen(),
         );
       },
     ),

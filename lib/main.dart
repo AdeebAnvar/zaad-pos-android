@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/constatnts/colors.dart';
 import 'package:pos_app/data/db/hive_db.dart';
+import 'package:pos_app/logic/auth_logic/auth_bloc.dart';
 import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
+import 'package:pos_app/logic/sale_logic/sale_bloc.dart';
+import 'package:pos_app/presentation/screens/dashboard/dashboard.dart';
 
 import 'presentation/routes/app_routes.dart' as route;
 
@@ -22,9 +25,16 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<DashBoardBloc>(
           create: (BuildContext context) => DashBoardBloc(),
+          child: DashBoardScreen(),
         ),
         BlocProvider<CrmBloc>(
           create: (BuildContext context) => CrmBloc(),
+        ),
+        BlocProvider<AuthBloc>(
+          create: (BuildContext context) => AuthBloc(),
+        ),
+        BlocProvider<SaleBloc>(
+          create: (BuildContext context) => SaleBloc(),
         ),
       ],
       child: MaterialApp.router(

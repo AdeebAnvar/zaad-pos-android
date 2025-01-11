@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_app/data/db/customer_db.dart';
 import 'package:pos_app/data/db/hive_db.dart';
+import 'package:pos_app/data/db/order_db.dart';
 import 'package:pos_app/data/models/customer_model.dart';
 import 'package:pos_app/data/models/orders_model.dart';
 
@@ -12,7 +14,7 @@ class CrmBloc extends Bloc<CrmEvent, CrmState> {
   CrmBloc() : super(CrmInitialState()) {
     on<GetAllCustomersEvent>((event, emit) async {
       emit(CrmScreenLoadingState());
-      allCustomers = HiveDb.getAllCustomers();
+      allCustomers = CustomerDb.getAllCustomers();
       emit(CrmScreenLoadingSuccessState(
         customersList: allCustomers,
         filteredCustomersList: allCustomers,
@@ -21,8 +23,8 @@ class CrmBloc extends Bloc<CrmEvent, CrmState> {
 
     on<AddCustomerEvent>((event, emit) async {
       emit(CrmScreenLoadingState());
-      HiveDb.storeCustomer(event.customer);
-      allCustomers = HiveDb.getAllCustomers();
+      CustomerDb.storeCustomer(event.customer);
+      allCustomers = CustomerDb.getAllCustomers();
       emit(CrmScreenLoadingSuccessState(
         customersList: allCustomers,
         filteredCustomersList: allCustomers,
@@ -61,7 +63,7 @@ class CrmBloc extends Bloc<CrmEvent, CrmState> {
 
     on<FetchCustomerOrdersEvent>((event, emit) {
       emit(CustomerOrdersFetchLoadingState());
-      List<OrderModel> ordersList = HiveDb.getAllOrdersOfCustomer(event.customerId);
+      List<OrderModel> ordersList = OrderDb.getAllOrdersOfCustomer(event.customerId);
       print("rfwr $ordersList");
       emit(CustomerOrdersFetchedState(orders: ordersList));
     });

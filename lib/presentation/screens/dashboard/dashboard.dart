@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
+import 'package:pos_app/presentation/screens/auth/login.dart';
 import 'package:pos_app/presentation/screens/dashboard/credit_sales.dart';
 import 'package:pos_app/presentation/screens/dashboard/crm.dart';
 import 'package:pos_app/presentation/screens/dashboard/day_closing.dart';
@@ -15,19 +16,19 @@ import 'package:pos_app/widgets/custom_textfield.dart';
 import '../../../../constatnts/colors.dart';
 import '../../../../constatnts/styles.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-  static String route = '/home';
+class DashBoardScreen extends StatefulWidget {
+  const DashBoardScreen({super.key});
+  static String route = '/dashboard';
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<DashBoardScreen> createState() => _DashBoardScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   bool isAnimating = false;
-  int selectedDrawerIndex = 1;
+  int selectedDrawerIndex = 2;
   final DashBoardBloc _dashBoardBloc = DashBoardBloc();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   final screens = [
@@ -66,11 +67,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         if (state is DashBoardSuccessState) {
           selectedDrawerIndex = state.index;
         }
-        if (state is SyncProductsLoadingState) {
+        if (state is SyncDataLoadingState) {
           isAnimating = state.isAnimating;
         }
-        if (state is SyncProductsSuccessState) {
+        if (state is SyncDataSuccessState) {
           isAnimating = state.isAnimating;
+          customSnackBar(context, "Data Loaded Please Refresh the screen");
           _controller.stop();
         }
       },
@@ -87,7 +89,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 AnimatedCrossFade(
                   firstChild: Text(""),
                   secondChild: Text(
-                    "Syncing...",
+                    switch (selectedDrawerIndex) {
+                      0 => "",
+                      1 => "Syncing Customers",
+                      2 => "Syncing Sale Data",
+                      3 => "Syncing recent sale data",
+                      4 => "Syncing Credit sale data",
+                      5 => "Syncing day closing data",
+                      6 => "Syncing expence data",
+                      7 => "",
+                      _ => "Syncing...",
+                    },
                     style: AppStyles.getSemiBoldTextStyle(fontSize: 14, color: Colors.white),
                   ),
                   crossFadeState: isAnimating ? CrossFadeState.showSecond : CrossFadeState.showFirst,
@@ -100,12 +112,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: IconButton(
                     onPressed: () async {
                       _controller.repeat();
-                      _dashBoardBloc.add(SyncProductsEvent());
-                      // await Future.delayed(const Duration(seconds: 10), () {
-                      //   if (mounted) {
-                      //     _controller.stop();
-                      //   }
-                      // });
+                      _dashBoardBloc.add(
+                        SyncDataEvent(
+                          screen: switch (selectedDrawerIndex) {
+                            0 => CurrentScreen.openingBalance,
+                            1 => CurrentScreen.crm,
+                            2 => CurrentScreen.sale,
+                            3 => CurrentScreen.recentSales,
+                            4 => CurrentScreen.creditSales,
+                            5 => CurrentScreen.dayClosing,
+                            6 => CurrentScreen.expense,
+                            7 => CurrentScreen.payBack,
+                            _ => CurrentScreen.sale,
+                          },
+                        ),
+                      );
                     },
                     icon: Icon(
                       Icons.sync,

@@ -199,7 +199,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                   ...productsList.expand(
                     (e) => [
                       Text(e.name),
-                      Text(e.category),
+                      Text(e.categoryId.toString()),
                       Text(e.discountPrice.toString()),
                       Text(e.unitPrice.toString()),
                     ],

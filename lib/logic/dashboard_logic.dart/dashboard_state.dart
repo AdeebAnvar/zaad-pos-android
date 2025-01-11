@@ -14,16 +14,16 @@ class DashBoardSuccessState extends DashBoardState {
   });
 }
 
-class SyncProductsLoadingState extends DashBoardState {
+class SyncDataLoadingState extends DashBoardState {
   bool isAnimating;
-  SyncProductsLoadingState({
+  SyncDataLoadingState({
     required this.isAnimating,
   });
 }
 
-class SyncProductsSuccessState extends DashBoardState {
+class SyncDataSuccessState extends DashBoardState {
   bool isAnimating;
-  SyncProductsSuccessState({
+  SyncDataSuccessState({
     required this.isAnimating,
   });
 }
