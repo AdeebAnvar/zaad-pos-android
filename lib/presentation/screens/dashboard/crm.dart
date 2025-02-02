@@ -19,17 +19,16 @@ class CrmScreen extends StatefulWidget {
 }
 
 class _CrmScreenState extends State<CrmScreen> {
-  final CrmBloc _crmBloc = CrmBloc();
+  TextEditingController customerData = TextEditingController();
   @override
   void initState() {
     super.initState();
-    _crmBloc.add(GetAllCustomersEvent());
+    BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CrmBloc, CrmState>(
-      bloc: _crmBloc,
       listener: (context, state) {},
       builder: (context, state) {
         if (state is CrmScreenLoadingSuccessState) {
@@ -39,6 +38,7 @@ class _CrmScreenState extends State<CrmScreen> {
               children: [
                 AutoCompleteTextField<CustomerModel>(
                   items: state.customersList,
+                  controller: customerData,
                   displayStringFunction: (v) {
                     return v.customerName ?? "";
                   },
@@ -48,22 +48,28 @@ class _CrmScreenState extends State<CrmScreen> {
                     customer.email ?? "",
                   ],
                   onSelected: (customer) {
-                    _crmBloc.add(SelectCustomerEvent(selectedCustomer: customer));
+                    BlocProvider.of<CrmBloc>(context).add(SelectCustomerEvent(selectedCustomer: customer));
                   },
                   onChanged: (value) {
-                    _crmBloc.add(SearchCustomersEvent(searchQuery: value));
+                    BlocProvider.of<CrmBloc>(context).add(SearchCustomersEvent(searchQuery: value));
                   },
                   defaultText: "Search Customer",
                   labelText: "Search Customer",
                 ),
                 SizedBox(height: 15),
                 if (state.customersList.isEmpty)
-                  SizedBox(
-                    height: MediaQuery.sizeOf(context).width / 1,
-                    child: Center(
-                      child: Text('No Customers Found'),
-                    ),
-                  )
+                  Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("No Data Found Please sync"),
+                      TextButton(
+                          onPressed: () {
+                            BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
+                          },
+                          child: Text("Refresh"))
+                    ],
+                  ))
                 else
                   ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
@@ -92,8 +98,17 @@ class _CrmScreenState extends State<CrmScreen> {
           );
         } else {
           return Center(
-            child: CircularProgressIndicator(),
-          );
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("No Data Found Please sync"),
+              TextButton(
+                  onPressed: () {
+                    BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
+                  },
+                  child: Text("Refresh"))
+            ],
+          ));
         }
       },
     );
@@ -133,7 +148,6 @@ class _CrmScreenState extends State<CrmScreen> {
       isScrollControlled: true,
       context: context,
       builder: (context) => BlocListener<CrmBloc, CrmState>(
-        bloc: _crmBloc,
         listener: (context, state) {
           if (state is CrmScreenLoadingState) {
             FocusScope.of(context).unfocus();
@@ -149,6 +163,7 @@ class _CrmScreenState extends State<CrmScreen> {
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
             child: Container(
+              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(20)),
               padding: const EdgeInsets.all(18),
               child: Form(
                 key: formKey,
@@ -251,7 +266,7 @@ class _CrmScreenState extends State<CrmScreen> {
                             gender: selectedGender.toString(),
                             mobileNumber: numberController.text,
                           );
-                          _crmBloc.add(AddCustomerEvent(customer: customer));
+                          BlocProvider.of<CrmBloc>(context).add(AddCustomerEvent(customer: customer));
                         }
                       },
                       style: AppStyles.filledButton,

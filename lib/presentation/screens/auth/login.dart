@@ -59,10 +59,10 @@ class LoginScreen extends StatelessWidget {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is FetchingUserFromServerState) {
-          loadingDialogue;
+          loadingDialogue(context);
         }
         if (state is CheckingUserOnLocalState) {
-          loadingDialogue;
+          loadingDialogue(context);
         }
         if (state is CheckedUserOnLocalState) {
           // context.pop();
@@ -131,6 +131,7 @@ class LoginScreen extends StatelessWidget {
                             if (v.isNullOrEmpty()) {
                               return "Enter username";
                             }
+                            return null;
                           },
                         ),
                       ),
@@ -145,6 +146,7 @@ class LoginScreen extends StatelessWidget {
                             if (v.isNullOrEmpty()) {
                               return "Enter password";
                             }
+                            return null;
                           },
                           controller: passWordController,
                           fillColor: Colors.white,
@@ -197,6 +199,8 @@ class LoginScreen extends StatelessWidget {
     showDialog(
         context: context,
         builder: (c) => AlertDialog(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
               content: Form(
                 key: formKey,
                 child: Column(
@@ -221,6 +225,7 @@ class LoginScreen extends StatelessWidget {
                           if (v.isNullOrEmpty()) {
                             return "Enter username";
                           }
+                          return null;
                         },
                       ),
                     ),
@@ -235,6 +240,7 @@ class LoginScreen extends StatelessWidget {
                           if (v.isNullOrEmpty()) {
                             return "Enter password";
                           }
+                          return null;
                         },
                         controller: passWordController,
                         fillColor: Colors.white,
@@ -248,10 +254,10 @@ class LoginScreen extends StatelessWidget {
                         if (!formKey.currentState!.validate()) {
                           return;
                         }
+                        c.pop();
                         BlocProvider.of<AuthBloc>(context).add(
                           CheckUserOnServer(userName: userNameController.text, password: passWordController.text),
                         );
-                        context.pop();
                       },
                       style: AppStyles.filledButton.copyWith(
                         fixedSize: WidgetStatePropertyAll<Size>(Size(MediaQuery.sizeOf(context).width, 60)),

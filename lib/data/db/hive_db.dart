@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pos_app/data/db/cart_db.dart';
 import 'package:pos_app/data/db/customer_db.dart';
 import 'package:pos_app/data/db/order_db.dart';
 import 'package:pos_app/data/db/product_db.dart';
@@ -13,5 +14,6 @@ class HiveDb {
     OrderDb.initOrderDb();
     ProductDb.initProductDb();
     ProductDb.initProductCategoryDb();
+    CartDb.initCartDb();
   }
 }

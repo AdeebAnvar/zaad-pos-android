@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pos_app/constatnts/enums.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
 import 'package:pos_app/presentation/screens/auth/login.dart';
 import 'package:pos_app/presentation/screens/dashboard/credit_sales.dart';
@@ -89,17 +90,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
                 AnimatedCrossFade(
                   firstChild: Text(""),
                   secondChild: Text(
-                    switch (selectedDrawerIndex) {
-                      0 => "",
-                      1 => "Syncing Customers",
-                      2 => "Syncing Sale Data",
-                      3 => "Syncing recent sale data",
-                      4 => "Syncing Credit sale data",
-                      5 => "Syncing day closing data",
-                      6 => "Syncing expence data",
-                      7 => "",
-                      _ => "Syncing...",
-                    },
+                    CurrentScreen.fromIndex(selectedDrawerIndex).syncMessage,
                     style: AppStyles.getSemiBoldTextStyle(fontSize: 14, color: Colors.white),
                   ),
                   crossFadeState: isAnimating ? CrossFadeState.showSecond : CrossFadeState.showFirst,
@@ -113,19 +104,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
                     onPressed: () async {
                       _controller.repeat();
                       _dashBoardBloc.add(
-                        SyncDataEvent(
-                          screen: switch (selectedDrawerIndex) {
-                            0 => CurrentScreen.openingBalance,
-                            1 => CurrentScreen.crm,
-                            2 => CurrentScreen.sale,
-                            3 => CurrentScreen.recentSales,
-                            4 => CurrentScreen.creditSales,
-                            5 => CurrentScreen.dayClosing,
-                            6 => CurrentScreen.expense,
-                            7 => CurrentScreen.payBack,
-                            _ => CurrentScreen.sale,
-                          },
-                        ),
+                        SyncDataEvent(screen: CurrentScreen.fromIndex(selectedDrawerIndex)),
                       );
                     },
                     icon: Icon(

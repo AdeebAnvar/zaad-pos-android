@@ -21,8 +21,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<CheckUserLocal>((event, emit) async {
       emit(CheckingUserOnLocalState());
-      UserModel userModel = UserDb.getUserFromLocal();
-      if (event.userName == userModel.name && event.password == userModel.password) {
+      UserModel? userModel = UserDb.getUserFromLocal();
+      if (userModel != null && event.userName == userModel.name && event.password == userModel.password) {
         emit(CheckedUserOnLocalState(userModel: userModel));
       } else {
         emit(CheckedUserOnLocalState(userModel: null));

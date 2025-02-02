@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/constatnts/colors.dart';
 import 'package:pos_app/data/db/hive_db.dart';
 import 'package:pos_app/logic/auth_logic/auth_bloc.dart';
+import 'package:pos_app/logic/cart_logic/cart_bloc.dart';
 import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
 import 'package:pos_app/logic/sale_logic/sale_bloc.dart';
@@ -35,6 +36,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<SaleBloc>(
           create: (BuildContext context) => SaleBloc(),
+        ),
+        BlocProvider<CartBloc>(
+          create: (BuildContext context) => CartBloc(),
         ),
       ],
       child: MaterialApp.router(

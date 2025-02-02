@@ -16,5 +16,3 @@ class SyncDataEvent extends DashBoardEvent {
     required this.screen,
   });
 }
-
-enum CurrentScreen { openingBalance, crm, sale, recentSales, creditSales, dayClosing, expense, payBack }

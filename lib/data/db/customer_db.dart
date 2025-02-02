@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:pos_app/data/models/customer_model.dart';
-import 'dart:math' show max;
 
 class CustomerDb {
   static String customerBoxName = "zaad_pos_customers";
@@ -8,15 +7,14 @@ class CustomerDb {
   static late Box customerBox;
   static initCustomerDb() async => customerBox = await Hive.openBox(customerBoxName);
 
-  static Future<void> storeCustomer(CustomerModel customer) async {
-    int nextId = 1;
-    if (customerBox.keys.isNotEmpty) {
-      final List<int> ids = customerBox.keys.map((key) => int.tryParse(key.toString()) ?? 0).toList();
-      nextId = (ids.reduce(max)) + 1;
-    }
+  static Future<int> storeCustomer(CustomerModel customer) async {
+    int customerId = await customerBox.add(customer.toMap());
 
-    customer.id = nextId;
-    await customerBox.put(customer.id, customer.toMap());
+    return customerId;
+  }
+
+  static Future<void> updateCustomer(int index, CustomerModel customer) async {
+    customerBox.putAt(index, customer.toMap());
   }
 
   static List<CustomerModel> getAllCustomers() {

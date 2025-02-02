@@ -11,8 +11,8 @@ class CustomerModel {
   String? email;
   String? gender;
   String? address;
-  List<OrderModel>? latestOrders;
-  List<FavouriteOrderModel>? favouriteOrderModel;
+  // List<OrderModel>? latestOrders;
+  // List<FavouriteOrderModel>? favouriteOrderModel;
   CustomerModel({
     this.id,
     this.customerName,
@@ -20,7 +20,8 @@ class CustomerModel {
     this.email,
     this.gender,
     this.address,
-    this.latestOrders,
+    // this.latestOrders,
+    // this.favouriteOrderModel,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,25 +32,33 @@ class CustomerModel {
       'email': email,
       'gender': gender,
       'address': address,
-      'latestOrders': latestOrders?.map((x) => x.toMap()).toList() ?? [],
+      // 'latestOrders': latestOrders?.map((x) => x.toMap()).toList(),
+      // 'favouriteOrderModel': favouriteOrderModel?.map((x) => x.toMap()).toList(),
     };
   }
 
   factory CustomerModel.fromMap(Map<String, dynamic> map) {
     return CustomerModel(
       id: map['id'] != null ? map['id'] as int : null,
-      customerName: map['customerName'] as String,
-      mobileNumber: map['mobileNumber'] as String,
-      email: map['email'] as String,
-      gender: map['gender'] as String,
-      address: map['address'] as String,
-      latestOrders: map['latestOrders'] != null
-          ? List<OrderModel>.from(
-              (map['latestOrders'] as List<dynamic>).map<OrderModel>(
-                (x) => OrderModel.fromMap(x as Map<String, dynamic>),
-              ),
-            )
-          : [],
+      customerName: map['customerName'] != null ? map['customerName'] as String : null,
+      mobileNumber: map['mobileNumber'] != null ? map['mobileNumber'] as String : null,
+      email: map['email'] != null ? map['email'] as String : null,
+      gender: map['gender'] != null ? map['gender'] as String : null,
+      address: map['address'] != null ? map['address'] as String : null,
+      // latestOrders: map['latestOrders'] != null
+      //     ? List<OrderModel>.from(
+      //         (map['latestOrders'] as List).map<OrderModel?>(
+      //           (x) => OrderModel.fromMap(x as Map<String, dynamic>),
+      //         ),
+      //       )
+      //     : null,
+      // favouriteOrderModel: map['favouriteOrderModel'] != null
+      //     ? List<FavouriteOrderModel>.from(
+      //         (map['favouriteOrderModel'] as List).map<FavouriteOrderModel?>(
+      //           (x) => FavouriteOrderModel.fromMap(x as Map<String, dynamic>),
+      //         ),
+      //       )
+      //     : null,
     );
   }
 

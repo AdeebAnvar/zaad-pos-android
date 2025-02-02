@@ -40,7 +40,13 @@ class SaleBloc extends Bloc<SaleEvent, SaleState> {
         List<ProductModel> filteredProducts;
 
         if (event.productName.isNotEmpty) {
-          filteredProducts = productsList.where((product) => product.name.toLowerCase().contains(event.productName.toLowerCase())).toList();
+          filteredProducts = productsList
+              .where(
+                (product) => product.name.toLowerCase().contains(
+                      event.productName.toLowerCase(),
+                    ),
+              )
+              .toList();
         } else {
           filteredProducts = productsList;
         }

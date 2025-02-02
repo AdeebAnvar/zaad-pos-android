@@ -42,115 +42,115 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
         bloc: _crmBloc,
         listener: (context, state) {},
         builder: (context, state) {
-          if (state is CustomerOrdersFetchedState) {
-            widget.customerModel.latestOrders = state.orders;
-            return ListView(
-              padding: EdgeInsets.all(14),
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 12,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  padding: EdgeInsets.all(18),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Personal Details",
-                        style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 15),
-                      buildLabel("Customer Name : ", widget.customerModel.customerName),
-                      buildLabel("Customer Phone Number : ", widget.customerModel.mobileNumber),
-                      buildLabel("Customer Email : ", widget.customerModel.email),
-                      buildLabel("Customer Address : ", widget.customerModel.address),
-                      buildLabel("Customer Gender : ", widget.customerModel.gender),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 18),
-                Container(
-                  padding: EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 12,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Latest 5 Orders",
-                        style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 15),
-                      ...widget.customerModel.latestOrders?.asMap().entries.take(5).expand((e) => [
-                                buildLabel(
-                                  "Reciept Number : ",
-                                  e.value.recieptNumber,
-                                  needPoPup: true,
-                                  onTapItems: () => showItemDialogue(context, productsList: e.value.products),
-                                ),
-                                buildLabel("Order Type : ", e.value.orderType),
-                                buildLabel("Gross Total : ", e.value.grossTotal.toString()),
-                                buildLabel("Discount : ", e.value.discount.toString()),
-                                buildLabel("Net Total : ", e.value.netTotal.toString()),
-                                e.key == (widget.customerModel.latestOrders!.take(5).length - 1) ? SizedBox() : Divider(),
-                              ]) ??
-                          []
-                    ],
-                  ),
-                ),
-                SizedBox(height: 18),
-                Container(
-                  padding: EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 12,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Top 5 Favourite Items",
-                        style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 15),
-                      ...widget.customerModel.favouriteOrderModel?.asMap().entries.take(5).expand((e) => [
-                                buildLabel("Item Name : ", e.value.product.name),
-                                buildLabel("count : ", e.value.purchasedCount),
-                                buildLabel("Amount : ", e.value.product.unitPrice.toString()),
-                                e.key == (widget.customerModel.latestOrders!.take(5).length - 1) ? SizedBox() : Divider(),
-                              ]) ??
-                          []
-                    ],
-                  ),
-                )
-              ],
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+          // if (state is CustomerOrdersFetchedState) {
+          //   widget.customerModel.latestOrders = state.orders;
+          //   return ListView(
+          //     padding: EdgeInsets.all(14),
+          //     children: [
+          //       Container(
+          //         decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           boxShadow: [
+          //             BoxShadow(
+          //               color: Colors.black26,
+          //               blurRadius: 12,
+          //             ),
+          //           ],
+          //           borderRadius: BorderRadius.circular(18),
+          //         ),
+          //         padding: EdgeInsets.all(18),
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             Text(
+          //               "Personal Details",
+          //               style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
+          //             ),
+          //             SizedBox(height: 15),
+          //             buildLabel("Customer Name : ", widget.customerModel.customerName),
+          //             buildLabel("Customer Phone Number : ", widget.customerModel.mobileNumber),
+          //             buildLabel("Customer Email : ", widget.customerModel.email),
+          //             buildLabel("Customer Address : ", widget.customerModel.address),
+          //             buildLabel("Customer Gender : ", widget.customerModel.gender),
+          //           ],
+          //         ),
+          //       ),
+          //       SizedBox(height: 18),
+          //       Container(
+          //         padding: EdgeInsets.all(18),
+          //         decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           boxShadow: [
+          //             BoxShadow(
+          //               color: Colors.black26,
+          //               blurRadius: 12,
+          //             ),
+          //           ],
+          //           borderRadius: BorderRadius.circular(18),
+          //         ),
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             Text(
+          //               "Latest 5 Orders",
+          //               style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
+          //             ),
+          //             SizedBox(height: 15),
+          //             ...widget.customerModel.latestOrders?.asMap().entries.take(5).expand((e) => [
+          //                       buildLabel(
+          //                         "Reciept Number : ",
+          //                         e.value.recieptNumber,
+          //                         needPoPup: true,
+          //                         onTapItems: () => showItemDialogue(context, productsList: e.value.products),
+          //                       ),
+          //                       buildLabel("Order Type : ", e.value.orderType),
+          //                       buildLabel("Gross Total : ", e.value.grossTotal.toString()),
+          //                       buildLabel("Discount : ", e.value.discount.toString()),
+          //                       buildLabel("Net Total : ", e.value.netTotal.toString()),
+          //                       e.key == (widget.customerModel.latestOrders!.take(5).length - 1) ? SizedBox() : Divider(),
+          //                     ]) ??
+          //                 []
+          //           ],
+          //         ),
+          //       ),
+          //       SizedBox(height: 18),
+          //       Container(
+          //         padding: EdgeInsets.all(18),
+          //         decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           boxShadow: [
+          //             BoxShadow(
+          //               color: Colors.black26,
+          //               blurRadius: 12,
+          //             ),
+          //           ],
+          //           borderRadius: BorderRadius.circular(18),
+          //         ),
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             Text(
+          //               "Top 5 Favourite Items",
+          //               style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
+          //             ),
+          //             SizedBox(height: 15),
+          //             ...widget.customerModel.favouriteOrderModel?.asMap().entries.take(5).expand((e) => [
+          //                       buildLabel("Item Name : ", e.value.product.name),
+          //                       buildLabel("count : ", e.value.purchasedCount),
+          //                       buildLabel("Amount : ", e.value.product.unitPrice.toString()),
+          //                       e.key == (widget.customerModel.latestOrders!.take(5).length - 1) ? SizedBox() : Divider(),
+          //                     ]) ??
+          //                 []
+          //           ],
+          //         ),
+          //       )
+          //     ],
+          //   );
+          // } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+          // }
         },
       ),
     );

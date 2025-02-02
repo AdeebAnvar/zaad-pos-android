@@ -60,16 +60,18 @@ class AppStyles {
   }
 
   static ButtonStyle filledButton = TextButton.styleFrom(
-    // padding: const EdgeInsets.all(20),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    backgroundColor: AppColors.primaryColor,
-    foregroundColor: Colors.white,
-  );
+      // padding: const EdgeInsets.all(20),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      backgroundColor: AppColors.primaryColor,
+      foregroundColor: Colors.white,
+      textStyle: AppStyles.getRegularTextStyle(fontSize: 12, color: Colors.white));
   static ButtonStyle outlinedButton = OutlinedButton.styleFrom(
       padding: const EdgeInsets.all(20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      // backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
       foregroundColor: AppColors.primaryColor,
+      textStyle: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.textColor),
       side: BorderSide(color: AppColors.textColor));
 
   static Color getButtonColor(Set<MaterialState> states) {

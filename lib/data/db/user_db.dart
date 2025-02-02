@@ -15,9 +15,13 @@ class UserDb {
   }
 
   // GET USER
-  static UserModel getUserFromLocal() {
-    final userData = userBox.getAt(0);
-    final Map<String, dynamic> userMap = Map<String, dynamic>.from(userData as Map);
-    return UserModel.fromMap(userMap);
+  static UserModel? getUserFromLocal() {
+    if (userBox.isNotEmpty) {
+      final userData = userBox.getAt(0);
+      final Map<String, dynamic> userMap = Map<String, dynamic>.from(userData as Map);
+      return UserModel.fromMap(userMap);
+    } else {
+      return null;
+    }
   }
 }
