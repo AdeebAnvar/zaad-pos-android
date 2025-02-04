@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:pos_app/data/models/favourite_order_model.dart';
 import 'package:pos_app/data/models/orders_model.dart';
 
 class CustomerModel {

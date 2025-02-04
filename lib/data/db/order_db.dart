@@ -25,6 +25,8 @@ class OrderDb {
   static List<OrderModel> getAllOrdersOfCustomer(int customerId) {
     final List<OrderModel> orders = orderBox.values
         .map((orderData) {
+          print('sdfasdf  ${orderData}');
+
           final Map<String, dynamic> orderMap = Map<String, dynamic>.from(orderData as Map);
           return OrderModel.fromMap(orderMap);
         })

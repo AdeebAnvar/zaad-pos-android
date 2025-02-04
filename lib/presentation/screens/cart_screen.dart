@@ -70,8 +70,8 @@ class _CartViewState extends State<CartView> {
       }
     }, builder: (context, state) {
       if (state is CartLoadedState) {
-        cashController.addListener(() => updateAmount(cashController, cardController, state.cart.grandTotal));
-        cardController.addListener(() => updateAmount(cardController, cashController, state.cart.grandTotal));
+        cashController.addListener(() => updateAmount(cashController, cardController, state.cart.grandTotal ?? 0.0));
+        cardController.addListener(() => updateAmount(cardController, cashController, state.cart.grandTotal ?? 0.0));
         if (selctedPaymentMode == PaymentMode.cash) {
           cashController.text = state.cart.grandTotal.toString();
         }
@@ -82,7 +82,7 @@ class _CartViewState extends State<CartView> {
             }
           },
           child: Scaffold(
-            body: state.cart.cartItems.isEmpty
+            body: state.cart.cartItems!.isEmpty
                 ? SizedBox(
                     height: 400,
                     child: Center(
@@ -135,9 +135,9 @@ class _CartViewState extends State<CartView> {
                                           padding: EdgeInsets.zero,
                                           shrinkWrap: true,
                                           physics: const NeverScrollableScrollPhysics(),
-                                          itemCount: state.cart.cartItems.length,
+                                          itemCount: state.cart.cartItems!.length,
                                           itemBuilder: (BuildContext c, int i) {
-                                            return CartProductCard(cartItemModel: state.cart.cartItems[i]);
+                                            return CartProductCard(cartItemModel: state.cart.cartItems![i]);
                                           },
                                         ),
                                         SizedBox(height: 18),
@@ -171,7 +171,7 @@ class _CartViewState extends State<CartView> {
                                                     setState(() {
                                                       index = e.key;
                                                       selctedPaymentMode = e.value;
-                                                      setAmount(state.cart.grandTotal);
+                                                      setAmount(state.cart.grandTotal ?? 0.0);
                                                     });
                                                   },
                                                   child: AnimatedContainer(
@@ -353,7 +353,7 @@ class _CartViewState extends State<CartView> {
                                             defaultText: "Customer Gender",
                                             labelText: 'Customer Gender',
                                             displayStringFunction: (v) {
-                                              return v ?? "";
+                                              return v;
                                             },
                                             focusNode: customerGenderFocus,
                                             onSelected: (customer) {
@@ -388,7 +388,7 @@ class _CartViewState extends State<CartView> {
                                                 mainAxisAlignment: MainAxisAlignment.end,
                                                 children: [
                                                   Text(
-                                                    state.cart.cartItems.length.toString(),
+                                                    state.cart.cartItems!.length.toString(),
                                                     style: AppStyles.getMediumTextStyle(fontSize: 17),
                                                   ),
                                                 ],
@@ -480,7 +480,7 @@ class _CartViewState extends State<CartView> {
                     ),
                   ),
                   SizedBox(width: 5),
-                  if (state.cart.cartItems.isNotEmpty)
+                  if (state.cart.cartItems!.isNotEmpty)
                     Expanded(
                       flex: 2,
                       child: TextButton(

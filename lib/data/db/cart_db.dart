@@ -24,7 +24,7 @@ class CartDb {
       }).toList();
       double grandTotal = 0.00;
       for (var cartItem in cartItemsList) {
-        grandTotal = cartItem.totalPrice + grandTotal;
+        grandTotal = cartItem.totalPrice! + grandTotal;
       }
       return CartModel(cartItems: cartItemsList, grandTotal: grandTotal);
     } else {

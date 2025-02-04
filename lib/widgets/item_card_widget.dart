@@ -35,11 +35,11 @@ class ProductCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              product.name,
+              product.name ?? "",
               style: AppStyles.getRegularTextStyle(fontSize: 13),
             ),
             Text(
-              'AED ${product.discountPrice == 0 || product.discountPrice <= product.unitPrice ? product.discountPrice : product.unitPrice}',
+              'AED ${product.discountPrice == 0 || product.discountPrice! <= product.unitPrice! ? product.discountPrice : product.unitPrice}',
               style: AppStyles.getRegularTextStyle(fontSize: 13),
             ),
           ],

@@ -30,7 +30,7 @@ class SaleBloc extends Bloc<SaleEvent, SaleState> {
         var filteredProducts = productsList;
         emit(SaleLoadedState(products: filteredProducts, categories: categoryList));
       } else {
-        var filteredProducts = productsList.where((e) => e.categoryId == event.id).toList();
+        var filteredProducts = productsList.where((e) => e.category == event.id).toList();
         emit(SaleLoadedState(products: filteredProducts, categories: categoryList));
       }
     });
@@ -42,7 +42,7 @@ class SaleBloc extends Bloc<SaleEvent, SaleState> {
         if (event.productName.isNotEmpty) {
           filteredProducts = productsList
               .where(
-                (product) => product.name.toLowerCase().contains(
+                (product) => product.name!.toLowerCase().contains(
                       event.productName.toLowerCase(),
                     ),
               )

@@ -59,7 +59,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                     child: AutoCompleteTextField<ProductModel>(
                       items: state.products,
                       displayStringFunction: (v) {
-                        return v.name;
+                        return v.name ?? "";
                       },
                       onSubmitted: (v) {
                         BlocProvider.of<SaleBloc>(context).add(SearchProductsEvent(productName: v));
@@ -70,7 +70,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                         productCategoryId = 0;
                       },
                       onSelected: (v) {
-                        BlocProvider.of<SaleBloc>(context).add(SearchProductsEvent(productName: v.name));
+                        BlocProvider.of<SaleBloc>(context).add(SearchProductsEvent(productName: v.name ?? ""));
                         productCategoryId = 0;
                       },
                       defaultText: "Products",
@@ -87,8 +87,8 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  BlocProvider.of<SaleBloc>(context).add(ChangeProductByCategoryEvent(id: e.id));
-                                  productCategoryId = e.id;
+                                  BlocProvider.of<SaleBloc>(context).add(ChangeProductByCategoryEvent(id: e.id ?? 0));
+                                  productCategoryId = e.id ?? 0;
                                 },
                                 child: AnimatedContainer(
                                   height: 60,
@@ -115,7 +115,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Text(
-                                            e.categoryNameEng,
+                                            e.categoryNameEng ?? "",
                                             style: AppStyles.getMediumTextStyle(
                                               fontSize: 14,
                                               color: e.id == productCategoryId ? Colors.white : null,
@@ -128,7 +128,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
                                             Text(
-                                              e.categoryNameArab,
+                                              e.categoryNameArab ?? "",
                                               style: AppStyles.getMediumTextStyle(
                                                 fontSize: 14,
                                                 color: e.id == productCategoryId ? Colors.white : null,
@@ -177,7 +177,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                     listener: (c, s) {},
                     builder: (context, cartState) {
                       if (cartState is CartLoadedState) {
-                        return cartState.cart.cartItems.isEmpty
+                        return cartState.cart.cartItems!.isEmpty
                             ? SizedBox()
                             : Align(
                                 alignment: Alignment.topRight,
@@ -190,7 +190,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      cartState.cart.cartItems.length.toString(),
+                                      cartState.cart.cartItems!.length.toString(),
                                       style: AppStyles.getBoldTextStyle(fontSize: 12, color: Colors.white),
                                     ),
                                   ),

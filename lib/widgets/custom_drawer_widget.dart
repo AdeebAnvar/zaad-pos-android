@@ -14,11 +14,11 @@ class CustomDrawerWidget extends StatelessWidget {
       DrawerButton(icon: "assets/images/svg/openingbal.svg", title: "Opening Balance"),
       DrawerButton(icon: "assets/images/svg/CRM.svg", title: "CRM"),
       DrawerButton(icon: "assets/images/svg/sale.svg", title: "Sale Window"),
-      DrawerButton(icon: "assets/images/svg/report.svg", title: "Recent Sales"),
-      DrawerButton(icon: "assets/images/svg/credit.svg", title: "Credit Sales"),
-      DrawerButton(icon: "assets/images/svg/units.svg", title: "Day Closing"),
-      DrawerButton(icon: "assets/images/svg/expenses.svg", title: "Expense"),
-      DrawerButton(icon: "assets/images/svg/performance_report.svg", title: "Pay Back"),
+      // DrawerButton(icon: "assets/images/svg/report.svg", title: "Recent Sales"),
+      // DrawerButton(icon: "assets/images/svg/credit.svg", title: "Credit Sales"),
+      // DrawerButton(icon: "assets/images/svg/units.svg", title: "Day Closing"),
+      // DrawerButton(icon: "assets/images/svg/expenses.svg", title: "Expense"),
+      // DrawerButton(icon: "assets/images/svg/performance_report.svg", title: "Pay Back"),
     ];
     return Container(
       width: MediaQuery.sizeOf(context).width / 1.5,

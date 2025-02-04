@@ -65,6 +65,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
     return BlocConsumer<DashBoardBloc, DashBoardState>(
       bloc: _dashBoardBloc,
       listener: (context, state) {
+        print(state);
         if (state is DashBoardSuccessState) {
           selectedDrawerIndex = state.index;
         }

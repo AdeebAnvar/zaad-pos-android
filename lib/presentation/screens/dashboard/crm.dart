@@ -33,53 +33,58 @@ class _CrmScreenState extends State<CrmScreen> {
       builder: (context, state) {
         if (state is CrmScreenLoadingSuccessState) {
           return Scaffold(
-            body: ListView(
-              padding: EdgeInsets.all(14),
-              children: [
-                AutoCompleteTextField<CustomerModel>(
-                  items: state.customersList,
-                  controller: customerData,
-                  displayStringFunction: (v) {
-                    return v.customerName ?? "";
-                  },
-                  searchFunction: (customer) => [
-                    customer.mobileNumber ?? "",
-                    customer.customerName ?? "",
-                    customer.email ?? "",
-                  ],
-                  onSelected: (customer) {
-                    BlocProvider.of<CrmBloc>(context).add(SelectCustomerEvent(selectedCustomer: customer));
-                  },
-                  onChanged: (value) {
-                    BlocProvider.of<CrmBloc>(context).add(SearchCustomersEvent(searchQuery: value));
-                  },
-                  defaultText: "Search Customer",
-                  labelText: "Search Customer",
-                ),
-                SizedBox(height: 15),
-                if (state.customersList.isEmpty)
-                  Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("No Data Found Please sync"),
-                      TextButton(
-                          onPressed: () {
-                            BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
-                          },
-                          child: Text("Refresh"))
-                    ],
-                  ))
-                else
-                  ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: state.filteredCustomersList.length,
-                    itemBuilder: (c, i) {
-                      return CustomerCard(customerModel: state.customersList[i]);
+            body: RefreshIndicator(
+              onRefresh: () async {
+                BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
+              },
+              child: ListView(
+                padding: EdgeInsets.all(14),
+                children: [
+                  AutoCompleteTextField<CustomerModel>(
+                    items: state.customersList,
+                    controller: customerData,
+                    displayStringFunction: (v) {
+                      return v.customerName ?? "";
                     },
+                    searchFunction: (customer) => [
+                      customer.mobileNumber ?? "",
+                      customer.customerName ?? "",
+                      customer.email ?? "",
+                    ],
+                    onSelected: (customer) {
+                      BlocProvider.of<CrmBloc>(context).add(SelectCustomerEvent(selectedCustomer: customer));
+                    },
+                    onChanged: (value) {
+                      BlocProvider.of<CrmBloc>(context).add(SearchCustomersEvent(searchQuery: value));
+                    },
+                    defaultText: "Search Customer",
+                    labelText: "Search Customer",
                   ),
-              ],
+                  SizedBox(height: 15),
+                  if (state.customersList.isEmpty)
+                    Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("No Data Found Please sync"),
+                        TextButton(
+                            onPressed: () {
+                              BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
+                            },
+                            child: Text("Refresh"))
+                      ],
+                    ))
+                  else
+                    ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: state.filteredCustomersList.length,
+                      itemBuilder: (c, i) {
+                        return CustomerCard(customerModel: state.customersList[i]);
+                      },
+                    ),
+                ],
+              ),
             ),
             bottomNavigationBar: Container(
               padding: EdgeInsets.all(10),
@@ -142,8 +147,10 @@ class _CrmScreenState extends State<CrmScreen> {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController numberController = TextEditingController();
     final TextEditingController addressController = TextEditingController();
+    final TextEditingController genderController = TextEditingController();
+    FocusNode focusNode = FocusNode();
     final GlobalKey<FormState> formKey = GlobalKey();
-    String? selectedGender;
+
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
@@ -238,14 +245,16 @@ class _CrmScreenState extends State<CrmScreen> {
                     AutoCompleteTextField<String>(
                       disableSearch: true,
                       labelText: "Select Gender",
+                      controller: genderController,
                       showAsUpperLabel: true,
+                      focusNode: focusNode,
                       optionsViewOpenDirection: OptionsViewOpenDirection.up,
                       items: ["Male", "Female"],
                       displayStringFunction: (v) {
                         return v;
                       },
                       onSelected: (v) {
-                        selectedGender = v;
+                        genderController.text = v;
                       },
                       validator: (v) {
                         if (v.isNullOrEmpty()) {
@@ -254,6 +263,7 @@ class _CrmScreenState extends State<CrmScreen> {
                         return null;
                       },
                       defaultText: "Gender",
+                      searchFunction: (v) => [genderController.text],
                     ),
                     const SizedBox(height: 14),
                     ElevatedButton(
@@ -263,7 +273,7 @@ class _CrmScreenState extends State<CrmScreen> {
                             address: addressController.text,
                             customerName: nameController.text,
                             email: emailController.text,
-                            gender: selectedGender.toString(),
+                            gender: genderController.text.toString(),
                             mobileNumber: numberController.text,
                           );
                           BlocProvider.of<CrmBloc>(context).add(AddCustomerEvent(customer: customer));

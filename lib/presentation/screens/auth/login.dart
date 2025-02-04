@@ -57,7 +57,7 @@ class LoginScreen extends StatelessWidget {
       passWordController.text = "1";
     }
     return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
+      listener: (c, state) {
         if (state is FetchingUserFromServerState) {
           loadingDialogue(context);
         }
@@ -65,7 +65,7 @@ class LoginScreen extends StatelessWidget {
           loadingDialogue(context);
         }
         if (state is CheckedUserOnLocalState) {
-          // context.pop();
+          context.pop();
           if (null != state.userModel) {
             context.goNamed(DashBoardScreen.route);
           } else {

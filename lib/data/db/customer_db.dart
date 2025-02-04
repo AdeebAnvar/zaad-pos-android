@@ -8,6 +8,7 @@ class CustomerDb {
   static initCustomerDb() async => customerBox = await Hive.openBox(customerBoxName);
 
   static Future<int> storeCustomer(CustomerModel customer) async {
+    customer.id = customerBox.isEmpty ? 1 : customerBox.keys.last + 1;
     int customerId = await customerBox.add(customer.toMap());
 
     return customerId;

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/data/db/customer_db.dart';
 import 'package:pos_app/data/db/hive_db.dart';
@@ -64,7 +66,6 @@ class CrmBloc extends Bloc<CrmEvent, CrmState> {
     on<FetchCustomerOrdersEvent>((event, emit) {
       emit(CustomerOrdersFetchLoadingState());
       List<OrderModel> ordersList = OrderDb.getAllOrdersOfCustomer(event.customerId);
-      print("rfwr $ordersList");
       emit(CustomerOrdersFetchedState(orders: ordersList));
     });
   }
