@@ -257,37 +257,6 @@ class _CartViewState extends State<CartView> {
                                           ),
                                           elevation: 4,
                                           child: AutoCompleteTextField<CustomerModel>(
-                                            controller: customerNameController,
-                                            items: customerList,
-                                            defaultText: "Customer Name",
-                                            labelText: 'Customer Name',
-                                            displayStringFunction: (v) {
-                                              return v.name ?? "";
-                                            },
-                                            focusNode: customerNameFocus,
-                                            onSelected: (customer) {
-                                              setCustomerVariables(customer);
-                                            },
-                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
-                                            onChanged: (value) {
-                                              customerNameController.text = value;
-                                            },
-                                            validator: (v) {
-                                              if (!v!.length.isGreaterThanZero()) {
-                                                return "Enter customer name";
-                                              }
-                                              return null;
-                                            },
-                                            selectedItems: [customerNameController.text],
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Material(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          elevation: 4,
-                                          child: AutoCompleteTextField<CustomerModel>(
                                             controller: customerPhoneController,
                                             items: customerList,
                                             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -311,6 +280,37 @@ class _CartViewState extends State<CartView> {
                                               return null;
                                             },
                                             selectedItems: [customerPhoneController.text],
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),
+                                        Material(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          elevation: 4,
+                                          child: AutoCompleteTextField<CustomerModel>(
+                                            controller: customerNameController,
+                                            items: customerList,
+                                            defaultText: "Customer Name",
+                                            labelText: 'Customer Name',
+                                            displayStringFunction: (v) {
+                                              return v.name ?? "";
+                                            },
+                                            focusNode: customerNameFocus,
+                                            onSelected: (customer) {
+                                              setCustomerVariables(customer);
+                                            },
+                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                                            onChanged: (value) {
+                                              customerNameController.text = value;
+                                            },
+                                            validator: (v) {
+                                              if (!v!.length.isGreaterThanZero()) {
+                                                return "Enter customer name";
+                                              }
+                                              return null;
+                                            },
+                                            selectedItems: [customerNameController.text],
                                           ),
                                         ),
                                         SizedBox(height: 20),
@@ -445,16 +445,16 @@ class _CartViewState extends State<CartView> {
                                                         'AED ${state.cart.grandTotal}',
                                                         style: AppStyles.getMediumTextStyle(fontSize: 17),
                                                       ),
-                                                      TextButton(
-                                                        onPressed: () => showDiscountDialogue(context),
-                                                        style: TextButton.styleFrom(
-                                                          padding: EdgeInsets.zero,
-                                                        ),
-                                                        child: Text(
-                                                          "> add discount",
-                                                          style: AppStyles.getMediumTextStyle(color: AppColors.stextColor, fontSize: 12),
-                                                        ),
-                                                      ),
+                                                      // TextButton(
+                                                      //   onPressed: () => showDiscountDialogue(context),
+                                                      //   style: TextButton.styleFrom(
+                                                      //     padding: EdgeInsets.zero,
+                                                      //   ),
+                                                      //   child: Text(
+                                                      //     "> add discount",
+                                                      //     style: AppStyles.getMediumTextStyle(color: AppColors.stextColor, fontSize: 12),
+                                                      //   ),
+                                                      // ),
                                                     ],
                                                   ),
                                                 ],
