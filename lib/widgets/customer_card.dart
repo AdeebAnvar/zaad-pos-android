@@ -27,11 +27,11 @@ class CustomerCard extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: ListTile(
             title: Text(
-              customerModel.customerName ?? "",
+              customerModel.name ?? "",
               style: AppStyles.getMediumTextStyle(fontSize: 14),
             ),
             subtitle: Text(
-              customerModel.mobileNumber ?? "",
+              customerModel.phone ?? "",
               style: AppStyles.getRegularTextStyle(fontSize: 14),
             ),
             leading: CircleAvatar(

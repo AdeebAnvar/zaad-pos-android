@@ -1,10 +1,16 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/constatnts/enums.dart';
+import 'package:pos_app/data/api/service.dart';
+import 'package:pos_app/data/api/urls.dart';
 import 'package:pos_app/data/db/customer_db.dart';
 import 'package:pos_app/data/db/product_db.dart';
 import 'package:pos_app/data/models/category_model.dart';
 import 'package:pos_app/data/models/customer_model.dart';
 import 'package:pos_app/data/models/product_model.dart';
+import 'package:pos_app/data/models/response_model.dart';
+import 'package:pos_app/widgets/custom_snackbar.dart';
 
 part 'dashboard_event.dart';
 part 'dashboard_state.dart';
@@ -20,140 +26,131 @@ class DashBoardBloc extends Bloc<DashBoardEvent, DashBoardState> {
       emit(SyncDataLoadingState(isAnimating: true));
 
       try {
-        await Future.delayed(Duration(seconds: 3));
         if (event.screen == CurrentScreen.sale) {
-          // get Products , Categories
-          ProductDb.storeProductCategories(dummyCategories);
-          ProductDb.storeProducts(dummyProducts);
+          await saleWindowData();
         } else if (event.screen == CurrentScreen.crm) {
-          List<CustomerModel> customerModelList = getDummyCustomers();
-          for (var i = 1; i <= customerModelList.length; i++) {
-            await CustomerDb.storeCustomer(customerModelList[i - 1]);
-          }
+          await crmData();
         }
       } finally {
         emit(SyncDataSuccessState(isAnimating: false));
       }
     });
   }
-}
 
-// Dummy data for categories
-final List<CategoryModel> dummyCategories = [
-  CategoryModel(
-    id: 1,
-    categoryNameEng: "Electronics",
-    categoryNameArab: "إلكترونيات",
-  ),
-  CategoryModel(
-    id: 2,
-    categoryNameEng: "Clothing",
-    categoryNameArab: "ملابس",
-  ),
-  CategoryModel(
-    id: 3,
-    categoryNameEng: "Home & Kitchen",
-    categoryNameArab: "المنزل والمطبخ",
-  ),
-  CategoryModel(
-    id: 4,
-    categoryNameEng: "Sports",
-    categoryNameArab: "رياضة",
-  ),
-];
+  Future<void> saleWindowData() async {
+    ResponseModel productsResponse = await ApiService.getApiData(Urls.getAllProducts);
+    ResponseModel categoryResponse = await ApiService.getApiData(Urls.getAllCategories);
+    if (productsResponse.isSuccess) {
+      List<ProductModel> productsList = List<ProductModel>.from(productsResponse.responseObject['data'].map((x) {
+        return ProductModel.fromJson(x);
+      }));
+      ProductDb.storeProducts(productsList);
 
-// Dummy data for products
-final List<ProductModel> dummyProducts = [
-  ProductModel(
-    id: 1,
-    name: "Smartphone X",
-    category: 1,
-    unitPrice: 999,
-    discountPrice: 899,
-  ),
-  ProductModel(
-    id: 2,
-    name: "Laptop Pro",
-    category: 1,
-    unitPrice: 1499,
-    discountPrice: 1399,
-  ),
-  ProductModel(
-    id: 3,
-    name: "Men's T-Shirt",
-    category: 2,
-    unitPrice: 29,
-    discountPrice: 25,
-  ),
-  ProductModel(
-    id: 4,
-    name: "Coffee Maker",
-    category: 3,
-    unitPrice: 89,
-    discountPrice: 79,
-  ),
-  ProductModel(
-    id: 5,
-    name: "Running Shoes",
-    category: 4,
-    unitPrice: 119,
-    discountPrice: 99,
-  ),
-  ProductModel(
-    id: 6,
-    name: "Wireless Earbuds",
-    category: 1,
-    unitPrice: 199,
-    discountPrice: 179,
-  ),
-  ProductModel(
-    id: 7,
-    name: "Women's Dress",
-    category: 2,
-    unitPrice: 79,
-    discountPrice: 69,
-  ),
-  ProductModel(
-    id: 8,
-    name: "Blender",
-    category: 3,
-    unitPrice: 69,
-    discountPrice: 59,
-  ),
-];
-List<CustomerModel> getDummyCustomers() {
-  return [
-    CustomerModel(
-      id: 1,
-      customerName: 'John Doe',
-      mobileNumber: '+1234567890',
-      email: 'john.doe@example.com',
-      gender: 'Male',
-      address: '123 Main St, Cityville',
-    ),
-    CustomerModel(
-      id: 2,
-      customerName: 'Jane Smith',
-      mobileNumber: '+0987654321',
-      email: 'jane.smith@example.com',
-      gender: 'Female',
-      address: '456 Oak Avenue, Townsburg',
-    ),
-    CustomerModel(
-      id: 3,
-      customerName: 'Michael Johnson',
-      mobileNumber: '+1122334455',
-      email: 'michael.j@example.com',
-      gender: 'Male',
-      address: '789 Pine Road, Villagetown',
-    ),
-    CustomerModel(
-      id: 4,
-      customerName: 'Emily Brown',
-      mobileNumber: '+5566778899',
-      email: 'emily.brown@example.com',
-      gender: 'Female',
-      address: '321 Maple Street, Metropolis',
-    ),
-  ];
+      CustomSnackBar.showSuccess(message: productsResponse.responseObject['message'] ?? "");
+    } else {
+      CustomSnackBar.showError(message: productsResponse.errorMessage ?? "");
+    }
+    if (categoryResponse.isSuccess) {
+      List<CategoryModel> categoryList = List<CategoryModel>.from(categoryResponse.responseObject['data'].map((x) {
+        return CategoryModel.fromJson(x);
+      }));
+      ProductDb.storeProductCategories(categoryList);
+
+      CustomSnackBar.showSuccess(message: "Successfully fetched" ?? "");
+    } else {
+      CustomSnackBar.showError(message: categoryResponse.errorMessage ?? "");
+    }
+  }
+
+  Future<void> crmData() async {
+    try {
+      List<CustomerModel> localCustomers = CustomerDb.getAllCustomers();
+      if (localCustomers.isNotEmpty) {
+        // First, upload new customers to the backend
+        for (var customer in localCustomers) {
+          // if (customer.id == null || customer.id == 0) {
+          print('Customer ${customer.toJson()}');
+          bool isSuccess = await uploadCustomer(customer);
+          print(customer.id);
+          if (!isSuccess) {
+            CustomSnackBar.showError(message: "Failed to sync customer: ${customer.name}");
+          }
+          // }
+        }
+      }
+
+      // Now fetch updated customer data from the backend
+      ResponseModel response = await ApiService.getApiData(Urls.getAllCustomers);
+
+      if (response.isSuccess) {
+        List<CustomerModel> customersList = List<CustomerModel>.from(response.responseObject['data'].map((x) => CustomerModel.fromJson(x)));
+
+        // Clear and re-store customers in local DB
+        await CustomerDb.customerBox.clear();
+        for (var customer in customersList) {
+          await CustomerDb.storeCustomer(customer);
+        }
+
+        CustomSnackBar.showSuccess(message: "Customer data synchronized successfully!");
+      } else {
+        CustomSnackBar.showError(message: response.errorMessage ?? "Error fetching customers");
+      }
+    } finally {}
+  }
+
+  Future<bool> uploadCustomer(CustomerModel customer) async {
+    final response = await ApiService.postApiData(
+      Urls.saveCustomer,
+      {
+        "id": customer.id ?? 0, // Send 0 if null
+        "isEdit": customer.id != null && customer.id != 0,
+        "name": customer.name,
+        "phone": customer.phone,
+        "email": customer.email,
+        "gender": customer.gender,
+        "address": customer.address,
+      },
+    );
+
+    print("Backend Response: ${response.responseObject}");
+
+    if (response.isSuccess) {
+      print("✅ Customer Synced Successfully");
+      return true;
+    } else {
+      print("❌ Error: ${response.errorMessage}");
+      return false;
+    }
+  }
+
+  // Future<void> _syncLocalCustomersToBackend() async {
+  //   List<CustomerModel> localCustomers = CustomerDb.getAllCustomers();
+
+  //   for (var customer in localCustomers) {
+  //     bool isEdit = customer.id != 0; // If ID exists, it's an update
+
+  //     try {
+  //       ResponseModel response = await ApiService.postApiData(
+  //         Urls.saveCustomer,
+  //         {
+  //           "id": isEdit ? customer.id : null, // Send ID only if updating
+  //           "isEdit": isEdit,
+  //           "name": customer.name,
+  //           "phone": customer.phone,
+  //           "email": customer.email,
+  //           "gender": customer.gender,
+  //           "address": customer.address,
+  //         },
+  //       );
+
+  //       // If it's a new customer, update local ID with the backend's assigned ID
+  //       if (!isEdit && response.isSuccess) {
+  //         customer.id = response.responseObject['data']['id']; // Extract ID from response
+  //         await CustomerDb.updateCustomer(customerBox.keys.toList().indexOf(customer), customer);
+  //       }
+  //     } catch (e) {
+  //       print("Failed to sync customer ${customer.name}: $e");
+  //     }
+  //   }
+  // }
 }

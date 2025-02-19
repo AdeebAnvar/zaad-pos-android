@@ -74,7 +74,6 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
         }
         if (state is SyncDataSuccessState) {
           isAnimating = state.isAnimating;
-          customSnackBar(context, "Data Loaded Please Refresh the screen");
           _controller.stop();
         }
       },

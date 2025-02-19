@@ -33,6 +33,7 @@ class _CartViewState extends State<CartView> {
   List<CustomerModel> customerList = [];
   FocusNode customerNameFocus = FocusNode();
   FocusNode customerPhoneFocus = FocusNode();
+  FocusNode customerEmailFocus = FocusNode();
   FocusNode customerAddressFocus = FocusNode();
   FocusNode customerGenderFocus = FocusNode();
   int index = 0;
@@ -43,6 +44,7 @@ class _CartViewState extends State<CartView> {
   GlobalKey<FormState> formKey = GlobalKey();
   TextEditingController customerNameController = TextEditingController();
   TextEditingController customerPhoneController = TextEditingController();
+  TextEditingController customerEmailController = TextEditingController();
   TextEditingController customerAddressController = TextEditingController();
   TextEditingController customerGenderController = TextEditingController();
   @override
@@ -66,7 +68,6 @@ class _CartViewState extends State<CartView> {
       if (s is CartSubmittedState) {
         context.pop();
         CartDb.clearDb();
-        customSnackBar(context, "Order Created");
       }
     }, builder: (context, state) {
       if (state is CartLoadedState) {
@@ -171,7 +172,7 @@ class _CartViewState extends State<CartView> {
                                                     setState(() {
                                                       index = e.key;
                                                       selctedPaymentMode = e.value;
-                                                      setAmount(state.cart.grandTotal ?? 0.0);
+                                                      setAmount(state.cart.grandTotal);
                                                     });
                                                   },
                                                   child: AnimatedContainer(
@@ -261,7 +262,7 @@ class _CartViewState extends State<CartView> {
                                             defaultText: "Customer Name",
                                             labelText: 'Customer Name',
                                             displayStringFunction: (v) {
-                                              return v.customerName ?? "";
+                                              return v.name ?? "";
                                             },
                                             focusNode: customerNameFocus,
                                             onSelected: (customer) {
@@ -271,14 +272,12 @@ class _CartViewState extends State<CartView> {
                                             onChanged: (value) {
                                               customerNameController.text = value;
                                             },
-                                            validator: customerNameController.text.isNotEmpty
-                                                ? (v) {
-                                                    if (!v!.length.isGreaterThanZero()) {
-                                                      return "Enter customer name";
-                                                    }
-                                                    return null;
-                                                  }
-                                                : null,
+                                            validator: (v) {
+                                              if (!v!.length.isGreaterThanZero()) {
+                                                return "Enter customer name";
+                                              }
+                                              return null;
+                                            },
                                             selectedItems: [customerNameController.text],
                                           ),
                                         ),
@@ -295,7 +294,7 @@ class _CartViewState extends State<CartView> {
                                             defaultText: "Customer Phone",
                                             labelText: 'Customer Phone',
                                             displayStringFunction: (v) {
-                                              return v.mobileNumber ?? "";
+                                              return v.phone ?? "";
                                             },
                                             focusNode: customerPhoneFocus,
                                             onSelected: (customer) {
@@ -305,15 +304,44 @@ class _CartViewState extends State<CartView> {
                                             onChanged: (value) {
                                               customerPhoneController.text = value;
                                             },
-                                            validator: customerPhoneController.text.isNotEmpty
-                                                ? (v) {
-                                                    if (!v!.length.isGreaterThanZero()) {
-                                                      return "Enter customer Mobile Number";
-                                                    }
-                                                    return null;
-                                                  }
-                                                : null,
+                                            validator: (v) {
+                                              if (!v!.length.isGreaterThanZero()) {
+                                                return "Enter customer Mobile Number";
+                                              }
+                                              return null;
+                                            },
                                             selectedItems: [customerPhoneController.text],
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),
+                                        Material(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          elevation: 4,
+                                          child: AutoCompleteTextField<CustomerModel>(
+                                            controller: customerEmailController,
+                                            items: customerList,
+                                            defaultText: "Customer Email",
+                                            labelText: 'Customer Email',
+                                            displayStringFunction: (v) {
+                                              return v.email ?? "";
+                                            },
+                                            focusNode: customerEmailFocus,
+                                            onSelected: (customer) {
+                                              setCustomerVariables(customer);
+                                            },
+                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                                            onChanged: (value) {
+                                              customerEmailController.text = value;
+                                            },
+                                            validator: (v) {
+                                              if (!v!.length.isGreaterThanZero()) {
+                                                return "Enter customer Email Id";
+                                              }
+                                              return null;
+                                            },
+                                            selectedItems: [customerEmailController.text],
                                           ),
                                         ),
                                         SizedBox(height: 20),
@@ -529,15 +557,15 @@ class _CartViewState extends State<CartView> {
                                         orderNumber: "ORD-${Random().nextDouble()}",
                                         orderType: "Counter sale",
                                         recieptNumber: "REC-${Random().nextDouble()}",
-                                        customerId: customerList.firstWhereOrNull((e) => e.mobileNumber == customerPhoneController.text)?.id ?? 0,
+                                        customerId: customerList.firstWhereOrNull((e) => e.phone == customerPhoneController.text)?.id ?? 0,
                                       );
                                       CustomerModel customerModel = CustomerModel(
-                                        customerName: customerNameController.text,
-                                        email: "",
+                                        name: customerNameController.text,
+                                        email: customerEmailController.text,
                                         address: customerAddressController.text,
                                         gender: customerGenderController.text,
-                                        id: customerList.firstWhereOrNull((e) => e.mobileNumber == customerPhoneController.text)?.id ?? 0,
-                                        mobileNumber: customerPhoneController.text,
+                                        id: customerList.firstWhereOrNull((e) => e.phone == customerPhoneController.text)?.id ?? 0,
+                                        phone: customerPhoneController.text,
                                       );
                                       BlocProvider.of<CartBloc>(context).add(
                                         SubmitingCartEvent(orderModel: orderModel, customerModel: customerModel),
@@ -634,10 +662,11 @@ class _CartViewState extends State<CartView> {
   }
 
   void setCustomerVariables(CustomerModel customer) {
-    customerNameController.text = customer.customerName ?? "";
+    customerNameController.text = customer.name ?? "";
     customerAddressController.text = customer.address ?? "";
     customerGenderController.text = customer.gender ?? "";
-    customerPhoneController.text = customer.mobileNumber ?? "";
+    customerPhoneController.text = customer.phone ?? "";
+    customerEmailController.text = customer.email ?? "";
   }
 
   void setAmount(double grandTotal) {

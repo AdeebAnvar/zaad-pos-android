@@ -128,7 +128,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
                                             Text(
-                                              e.categoryNameArab ?? "",
+                                              e.categoryNameArabic ?? "",
                                               style: AppStyles.getMediumTextStyle(
                                                 fontSize: 14,
                                                 color: e.id == productCategoryId ? Colors.white : null,

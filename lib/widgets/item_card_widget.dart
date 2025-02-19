@@ -39,7 +39,7 @@ class ProductCard extends StatelessWidget {
               style: AppStyles.getRegularTextStyle(fontSize: 13),
             ),
             Text(
-              'AED ${product.discountPrice == 0 || product.discountPrice! <= product.unitPrice! ? product.discountPrice : product.unitPrice}',
+              'AED ${(product.discountPrice ?? 0) == 0 || (product.discountPrice ?? 0) <= (product.unitPrice ?? 0) ? (product.unitPrice ?? 0) : (product.discountPrice ?? 0)}',
               style: AppStyles.getRegularTextStyle(fontSize: 13),
             ),
           ],

@@ -41,8 +41,7 @@ class CrmBloc extends Bloc<CrmEvent, CrmState> {
             ? allCustomers
             : allCustomers
                 .where(
-                  (customer) =>
-                      customer.customerName!.toLowerCase().contains(query) || customer.mobileNumber!.toLowerCase().contains(query) || customer.email!.toLowerCase().contains(query),
+                  (customer) => customer.name!.toLowerCase().contains(query) || customer.phone!.toLowerCase().contains(query) || customer.email!.toLowerCase().contains(query),
                 )
                 .toList();
 

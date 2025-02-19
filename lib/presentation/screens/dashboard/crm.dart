@@ -44,11 +44,11 @@ class _CrmScreenState extends State<CrmScreen> {
                     items: state.customersList,
                     controller: customerData,
                     displayStringFunction: (v) {
-                      return v.customerName ?? "";
+                      return v.name ?? "";
                     },
                     searchFunction: (customer) => [
-                      customer.mobileNumber ?? "",
-                      customer.customerName ?? "",
+                      customer.phone ?? "",
+                      customer.name ?? "",
                       customer.email ?? "",
                     ],
                     onSelected: (customer) {
@@ -271,10 +271,10 @@ class _CrmScreenState extends State<CrmScreen> {
                         if (formKey.currentState!.validate()) {
                           CustomerModel customer = CustomerModel(
                             address: addressController.text,
-                            customerName: nameController.text,
+                            name: nameController.text,
                             email: emailController.text,
                             gender: genderController.text.toString(),
-                            mobileNumber: numberController.text,
+                            phone: numberController.text,
                           );
                           BlocProvider.of<CrmBloc>(context).add(AddCustomerEvent(customer: customer));
                         }

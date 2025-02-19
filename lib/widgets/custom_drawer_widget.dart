@@ -1,8 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/colors.dart';
 import 'package:pos_app/constatnts/styles.dart';
+import 'package:pos_app/data/db/hive_db.dart';
+import 'package:pos_app/presentation/screens/auth/login.dart';
 
 class CustomDrawerWidget extends StatelessWidget {
   const CustomDrawerWidget({super.key, this.index = 1, required this.onClick});
@@ -79,22 +82,28 @@ class CustomDrawerWidget extends StatelessWidget {
               ),
             )),
         Spacer(),
-        AnimatedContainer(
-          duration: Duration(milliseconds: 800),
-          margin: EdgeInsets.all(5),
-          height: 50,
-          padding: EdgeInsets.symmetric(horizontal: 17, vertical: 8),
-          decoration: BoxDecoration(color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
-          child: Center(
-            child: Row(
-              children: [
-                Icon(color: Colors.white, Icons.power_settings_new_rounded),
-                SizedBox(width: 18),
-                Text(
-                  "Logout",
-                  style: AppStyles.getMediumTextStyle(fontSize: 14, color: Colors.white),
-                ),
-              ],
+        InkWell(
+          onTap: () {
+            HiveDb.clearDb();
+            context.goNamed(LoginScreen.route);
+          },
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 800),
+            margin: EdgeInsets.all(5),
+            height: 50,
+            padding: EdgeInsets.symmetric(horizontal: 17, vertical: 8),
+            decoration: BoxDecoration(color: AppColors.primaryColor, borderRadius: BorderRadius.circular(10)),
+            child: Center(
+              child: Row(
+                children: [
+                  Icon(color: Colors.white, Icons.power_settings_new_rounded),
+                  SizedBox(width: 18),
+                  Text(
+                    "Logout",
+                    style: AppStyles.getMediumTextStyle(fontSize: 14, color: Colors.white),
+                  ),
+                ],
+              ),
             ),
           ),
         )

@@ -6,6 +6,7 @@ import 'package:pos_app/constatnts/colors.dart';
 import 'package:pos_app/data/utils/extensions.dart';
 import 'package:pos_app/logic/auth_logic/auth_bloc.dart';
 import 'package:pos_app/presentation/screens/dashboard/dashboard.dart';
+import 'package:pos_app/widgets/custom_snackbar.dart';
 
 import '../../../../constatnts/styles.dart';
 import '../../../../widgets/custom_textfield.dart';
@@ -26,27 +27,27 @@ loadingDialogue(BuildContext context) {
       });
 }
 
-customSnackBar(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      backgroundColor: AppColors.primaryColor,
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(10),
-        topRight: Radius.circular(10),
-      )),
-      content: Text(
-        message,
-        style: AppStyles.getRegularTextStyle(fontSize: 14, color: Colors.white),
-      ),
-    ),
-  );
-}
+// customSnackBar(BuildContext context, String message) {
+//   ScaffoldMessenger.of(context).showSnackBar(
+//     SnackBar(
+//       backgroundColor: AppColors.primaryColor,
+//       elevation: 4,
+//       shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.only(
+//         topLeft: Radius.circular(10),
+//         topRight: Radius.circular(10),
+//       )),
+//       content: Text(
+//         message,
+//         style: AppStyles.getRegularTextStyle(fontSize: 14, color: Colors.white),
+//       ),
+//     ),
+//   );
+// }
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
+  static String route = '/login';
   @override
   Widget build(BuildContext context) {
     final TextEditingController userNameController = TextEditingController();
@@ -69,21 +70,15 @@ class LoginScreen extends StatelessWidget {
           if (null != state.userModel) {
             context.goNamed(DashBoardScreen.route);
           } else {
-            customSnackBar(context, "User not found! Please try again");
+            CustomSnackBar.showError(message: 'User not found');
           }
         }
         if (state is FetchedUserFromServerState) {
           context.pop();
-          if (!state.haveUser) {
-            customSnackBar(
-              context,
-              "No user found on server",
-            );
+          if (state.status) {
+            CustomSnackBar.showSuccess(message: "${state.message}!. Please login");
           } else {
-            customSnackBar(
-              context,
-              "User found! Please log in",
-            );
+            CustomSnackBar.showError(message: state.message);
           }
         }
       },
@@ -160,6 +155,7 @@ class LoginScreen extends StatelessWidget {
                           if (!formKey.currentState!.validate()) {
                             return;
                           }
+
                           // context.goNamed(HomeScreen)
                           BlocProvider.of<AuthBloc>(context).add(
                             CheckUserLocal(userName: userNameController.text, password: passWordController.text),
@@ -256,7 +252,7 @@ class LoginScreen extends StatelessWidget {
                         }
                         c.pop();
                         BlocProvider.of<AuthBloc>(context).add(
-                          CheckUserOnServer(userName: userNameController.text, password: passWordController.text),
+                          CheckUserOnServer(context: context, userName: userNameController.text, password: passWordController.text),
                         );
                       },
                       style: AppStyles.filledButton.copyWith(

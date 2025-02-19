@@ -46,10 +46,12 @@ class CartItemModel {
   });
 
   Map<String, dynamic> toMap() {
-    double priceofProduct = (product.discountPrice < product.unitPrice || product.unitPrice == 0 ? product.discountPrice : product.unitPrice).toDouble();
+    double priceOfProduct = (product.discountPrice != null && product.unitPrice != null && (product.discountPrice! < product.unitPrice! || product.unitPrice == 0))
+        ? product.discountPrice ?? 0
+        : product.unitPrice ?? 0;
     return <String, dynamic>{
-      'total_price': priceofProduct * quantity,
-      'product': product.toMap(),
+      'total_price': priceOfProduct * quantity,
+      'product': product.toJson(),
       'quantity': quantity,
     };
   }
@@ -57,7 +59,7 @@ class CartItemModel {
   factory CartItemModel.fromMap(Map<String, dynamic> map) {
     return CartItemModel(
       totalPrice: map['total_price'] as double,
-      product: ProductModel.fromMap(Map<String, dynamic>.from(map['product'])), // Explicit conversion
+      product: ProductModel.fromJson(Map<String, dynamic>.from(map['product'])), // Explicit conversion
       quantity: map['quantity'] as int,
     );
   }

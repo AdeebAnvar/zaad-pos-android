@@ -1,33 +1,33 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// To parse this JSON data, do
+//
+//     final categoryModel = categoryModelFromJson(jsonString);
+
 import 'dart:convert';
 
+List<CategoryModel> categoryModelFromJson(String str) => List<CategoryModel>.from(json.decode(str).map((x) => CategoryModel.fromJson(x)));
+
+String categoryModelToJson(List<CategoryModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class CategoryModel {
-  int id;
-  String categoryNameEng;
-  String categoryNameArab;
+  int? id;
+  String? categoryNameEng;
+  String? categoryNameArabic;
+
   CategoryModel({
-    required this.id,
-    required this.categoryNameEng,
-    required this.categoryNameArab,
+    this.id,
+    this.categoryNameEng,
+    this.categoryNameArabic,
   });
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'categoryNameEng': categoryNameEng,
-      'categoryNameArab': categoryNameArab,
-    };
-  }
+  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
+        id: json["id"],
+        categoryNameEng: json["category_name_eng"],
+        categoryNameArabic: json["category_name_arabic"],
+      );
 
-  factory CategoryModel.fromMap(Map<String, dynamic> map) {
-    return CategoryModel(
-      id: map['id'] as int,
-      categoryNameEng: map['categoryNameEng'] as String,
-      categoryNameArab: map['categoryNameArab'] as String,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory CategoryModel.fromJson(String source) => CategoryModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "category_name_eng": categoryNameEng,
+        "category_name_arabic": categoryNameArabic,
+      };
 }

@@ -17,14 +17,14 @@ class ProductDb {
 // STORE CATEGORIES
   static storeProductCategories(List<CategoryModel> categoryList) async {
     for (var category in categoryList) {
-      await productCategoryBox.put(category.id, category.toMap());
+      await productCategoryBox.put(category.id, category.toJson());
     }
   }
 
 // STORE PRODUCTS
   static storeProducts(List<ProductModel> productsList) async {
     for (var product in productsList) {
-      await productBox.put(product.id, product.toMap());
+      await productBox.put(product.id, product.toJson());
     }
   }
 
@@ -32,7 +32,7 @@ class ProductDb {
   static List<CategoryModel> getCategories() {
     return productCategoryBox.values.map((productCategoryData) {
       final Map<String, dynamic> productCategoryMap = Map<String, dynamic>.from(productCategoryData as Map);
-      return CategoryModel.fromMap(productCategoryMap);
+      return CategoryModel.fromJson(productCategoryMap);
     }).toList();
   }
 
@@ -40,7 +40,7 @@ class ProductDb {
   static List<ProductModel> getProducts() {
     return productBox.values.map((productData) {
       final Map<String, dynamic> productMap = Map<String, dynamic>.from(productData as Map);
-      return ProductModel.fromMap(productMap);
+      return ProductModel.fromJson(productMap);
     }).toList();
   }
 }

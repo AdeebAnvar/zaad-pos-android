@@ -14,7 +14,7 @@ class SaleBloc extends Bloc<SaleEvent, SaleState> {
       try {
         categoryList = ProductDb.getCategories();
         productsList = ProductDb.getProducts();
-        categoryList.insert(0, CategoryModel(id: 0, categoryNameEng: "All", categoryNameArab: ""));
+        categoryList.insert(0, CategoryModel(id: 0, categoryNameEng: "All", categoryNameArabic: ""));
         if (categoryList.isEmpty || productsList.isEmpty) {
           emit(SaleErrorState(message: "No data found"));
           return;
@@ -30,7 +30,7 @@ class SaleBloc extends Bloc<SaleEvent, SaleState> {
         var filteredProducts = productsList;
         emit(SaleLoadedState(products: filteredProducts, categories: categoryList));
       } else {
-        var filteredProducts = productsList.where((e) => e.category == event.id).toList();
+        var filteredProducts = productsList.where((e) => e.categoryId == event.id).toList();
         emit(SaleLoadedState(products: filteredProducts, categories: categoryList));
       }
     });

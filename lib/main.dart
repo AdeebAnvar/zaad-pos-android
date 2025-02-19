@@ -7,9 +7,11 @@ import 'package:pos_app/logic/cart_logic/cart_bloc.dart';
 import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
 import 'package:pos_app/logic/sale_logic/sale_bloc.dart';
-import 'package:pos_app/presentation/screens/dashboard/dashboard.dart';
 
 import 'presentation/routes/app_routes.dart' as route;
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +28,6 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<DashBoardBloc>(
           create: (BuildContext context) => DashBoardBloc(),
-          child: DashBoardScreen(),
         ),
         BlocProvider<CrmBloc>(
           create: (BuildContext context) => CrmBloc(),
@@ -54,7 +55,10 @@ class MyApp extends StatelessWidget {
             iconTheme: IconThemeData(color: AppColors.primaryColor),
           ),
           dialogBackgroundColor: Colors.white,
-          bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white, surfaceTintColor: Colors.transparent),
+          bottomSheetTheme: BottomSheetThemeData(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+          ),
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
           scaffoldBackgroundColor: AppColors.scaffoldColor,
           useMaterial3: true,

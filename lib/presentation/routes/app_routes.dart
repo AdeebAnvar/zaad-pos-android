@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/data/models/customer_model.dart';
+import 'package:pos_app/main.dart';
 import 'package:pos_app/presentation/screens/cart_screen.dart';
 import 'package:pos_app/presentation/screens/dashboard/customer_details.dart';
 import 'package:pos_app/presentation/screens/dashboard/dashboard.dart';
@@ -9,6 +10,7 @@ import '../screens/auth/login.dart';
 
 GoRouter router = GoRouter(
   initialLocation: '/',
+  navigatorKey: navigatorKey,
   routes: <RouteBase>[
     GoRoute(
       path: '/',
@@ -50,6 +52,16 @@ GoRouter router = GoRouter(
         return getCustomTransition(
           state,
           const CartView(),
+        );
+      },
+    ),
+    GoRoute(
+      path: LoginScreen.route,
+      name: LoginScreen.route,
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        return getCustomTransition(
+          state,
+          const LoginScreen(),
         );
       },
     ),

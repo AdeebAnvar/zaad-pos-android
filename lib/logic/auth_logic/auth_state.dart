@@ -8,9 +8,11 @@ class AuthInitialState extends AuthState {}
 class FetchingUserFromServerState extends AuthState {}
 
 class FetchedUserFromServerState extends AuthState {
-  bool haveUser;
+  String message;
+  bool status;
   FetchedUserFromServerState({
-    required this.haveUser,
+    required this.message,
+    required this.status,
   });
 }
 

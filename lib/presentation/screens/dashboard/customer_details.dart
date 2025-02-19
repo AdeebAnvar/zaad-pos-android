@@ -51,10 +51,10 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 12,
-                      ),
+                      // BoxShadow(
+                      //   color: Colors.black26,
+                      //   blurRadius: 12,
+                      // ),
                     ],
                     borderRadius: BorderRadius.circular(18),
                   ),
@@ -67,8 +67,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                         style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
                       ),
                       SizedBox(height: 15),
-                      buildLabel("Customer Name  : ", widget.customerModel.customerName),
-                      buildLabel("Customer Phone Number : ", widget.customerModel.mobileNumber),
+                      buildLabel("Customer Name  : ", widget.customerModel.name),
+                      buildLabel("Customer Phone Number : ", widget.customerModel.phone),
                       buildLabel("Customer Email : ", widget.customerModel.email),
                       buildLabel("Customer Address : ", widget.customerModel.address),
                       buildLabel("Customer Gender : ", widget.customerModel.gender),
@@ -76,76 +76,39 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: 18),
-                Container(
-                  padding: EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 12,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(18),
+                ExpansionTile(
+                  backgroundColor: Colors.white,
+                  collapsedBackgroundColor: Colors.white,
+                  collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  childrenPadding: EdgeInsets.all(12),
+                  dense: true,
+                  shape: RoundedRectangleBorder(),
+                  title: Text(
+                    "Latest 5 Orders",
+                    style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Latest 5 Orders",
-                        style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 15),
-                      ...state.orders.asMap().entries.take(5).expand((e) => [
-                                buildLabel(
-                                  "Reciept Number : ",
-                                  e.value.recieptNumber,
-                                  needPoPup: true,
-                                  onTapItems: () {
-                                    showItemDialogue(context, productsList: e.value.cart?.cartItems ?? []);
-                                  },
-                                ),
-                                buildLabel("Order Type : ", e.value.orderType),
-                                buildLabel("Gross Total : ", e.value.grossTotal.toString()),
-                                buildLabel("Discount : ", e.value.discount.toString()),
-                                buildLabel("Net Total : ", e.value.netTotal.toString()),
-                                e.key == (state.orders.take(5).length - 1) ? SizedBox() : Divider(),
-                              ]) ??
-                          []
-                    ],
-                  ),
+                  children: state.orders
+                      .asMap()
+                      .entries
+                      .take(5)
+                      .expand((e) => [
+                            buildLabel(
+                              "Reciept Number : ",
+                              e.value.recieptNumber,
+                              needPoPup: true,
+                              onTapItems: () {
+                                showItemDialogue(context, productsList: e.value.cart?.cartItems ?? []);
+                              },
+                            ),
+                            buildLabel("Order Type : ", e.value.orderType),
+                            buildLabel("Gross Total : ", e.value.grossTotal.toString()),
+                            buildLabel("Discount : ", e.value.discount.toString()),
+                            buildLabel("Net Total : ", e.value.netTotal.toString()),
+                            e.key == (state.orders.take(5).length - 1) ? SizedBox() : Divider(),
+                          ])
+                      .toList(),
                 ),
                 SizedBox(height: 18),
-                Container(
-                  padding: EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 12,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Top 5 Favourite Items",
-                        style: AppStyles.getSemiBoldTextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 15),
-                      // ...widget.customerModel.favouriteOrderModel?.asMap().entries.take(5).expand((e) => [
-                      //           buildLabel("Item Name : ", e.value.product.name),
-                      //           buildLabel("count : ", e.value.purchasedCount),
-                      //           buildLabel("Amount : ", e.value.product.unitPrice.toString()),
-                      //           e.key == (widget.customerModel.latestOrders!.take(5).length - 1) ? SizedBox() : Divider(),
-                      //         ]) ??
-                      //     []
-                    ],
-                  ),
-                )
               ],
             );
           } else {
