@@ -1,99 +1,93 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// To parse this JSON data, do
+//
+//     final orderModel = orderModelFromJson(jsonString);
+
 import 'dart:convert';
 
-import 'package:pos_app/constatnts/enums.dart';
-import 'package:pos_app/data/models/cart_model.dart';
-import 'package:pos_app/data/models/product_model.dart';
+List<OrderModel> orderModelFromJson(String str) => List<OrderModel>.from(json.decode(str).map((x) => OrderModel.fromJson(x)));
+
+String orderModelToJson(List<OrderModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class OrderModel {
-  int? id;
-  int? customerId;
-  double? cardAmount;
-  double? cashAmount;
-  PaymentMode? paymentMethod;
-  final String recieptNumber;
-  final String orderType;
-  final String orderNumber;
-  final double grossTotal;
-  final double discount;
-  final double netTotal;
-  final CartModel cart;
+  int? orderId;
+  num? customerId;
+  num? cardAmount;
+  num? cashAmount;
+  String? paymentMethod;
+  String? recieptNumber;
+  String? orderType;
+  String? orderNumber;
+  num? grossTotal;
+  num? discount;
+  num? netTotal;
+  List<OrderItem>? orderItems;
 
   OrderModel({
-    this.id,
+    this.orderId,
     this.customerId,
     this.cardAmount,
     this.cashAmount,
     this.paymentMethod,
-    required this.recieptNumber,
-    required this.orderType,
-    required this.orderNumber,
-    required this.grossTotal,
-    required this.discount,
-    required this.netTotal,
-    required this.cart,
+    this.recieptNumber,
+    this.orderType,
+    this.orderNumber,
+    this.grossTotal,
+    this.discount,
+    this.netTotal,
+    this.orderItems,
   });
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'customerId': customerId,
-      'cardAmount': cardAmount,
-      'cashAmount': cashAmount,
-      'paymentMethod': paymentMethod == PaymentMode.card
-          ? "Card"
-          : paymentMethod == PaymentMode.cash
-              ? "Cash"
-              : paymentMethod == PaymentMode.split
-                  ? "Split"
-                  : "Credit",
-      'recieptNumber': recieptNumber,
-      'orderType': orderType,
-      'orderNumber': orderNumber,
-      'grossTotal': grossTotal,
-      'discount': discount,
-      'netTotal': netTotal,
-      'cart': cart.toMap(),
-    };
-  }
+  factory OrderModel.fromJson(Map<String, dynamic> json) => OrderModel(
+        orderId: json["order_id"],
+        customerId: json["customerId"],
+        cardAmount: json["cardAmount"],
+        cashAmount: json["cashAmount"],
+        paymentMethod: json["paymentMethod"],
+        recieptNumber: json["reciept_number"],
+        orderType: json["order_type"],
+        orderNumber: json["order_number"],
+        grossTotal: json["grossTotal"],
+        discount: json["discount"],
+        netTotal: json["netTotal"],
+        orderItems: json["orderItems"] == null ? [] : List<OrderItem>.from(json["orderItems"]!.map((x) => OrderItem.fromJson(x))),
+      );
 
-  factory OrderModel.fromMap(Map<String, dynamic> map) {
-    // Ensure map['cart'] is a Map<String, dynamic>
-    final cartMap = map['cart'] is Map<String, dynamic> ? map['cart'] as Map<String, dynamic> : <String, dynamic>{};
+  Map<String, dynamic> toJson() => {
+        "order_id": orderId,
+        "customerId": customerId,
+        "cardAmount": cardAmount,
+        "cashAmount": cashAmount,
+        "paymentMethod": paymentMethod,
+        "reciept_number": recieptNumber,
+        "order_type": orderType,
+        "order_number": orderNumber,
+        "grossTotal": grossTotal,
+        "discount": discount,
+        "netTotal": netTotal,
+        "orderItems": orderItems == null ? [] : List<dynamic>.from(orderItems!.map((x) => x.toJson())),
+      };
+}
 
-    return OrderModel(
-      id: map['id'] != null ? map['id'] as int : null,
-      customerId: map['customerId'] != null ? map['customerId'] as int : null,
-      cardAmount: map['cardAmount'] != null ? map['cardAmount'] as double : null,
-      cashAmount: map['cashAmount'] != null ? map['cashAmount'] as double : null,
-      paymentMethod: map['paymentMethod'] != null ? _paymentMethodFromString(map['paymentMethod'] as String) : null,
-      recieptNumber: map['recieptNumber'] as String,
-      orderType: map['orderType'] as String,
-      orderNumber: map['orderNumber'] as String,
-      grossTotal: map['grossTotal'] as double,
-      discount: map['discount'] as double,
-      netTotal: map['netTotal'] as double,
-      cart: CartModel.fromMap(cartMap), // Using the corrected cartMap
-    );
-  }
+class OrderItem {
+  int? price;
+  int? quantity;
+  int? productId;
 
-  String toJson() => json.encode(toMap());
+  OrderItem({
+    this.price,
+    this.quantity,
+    this.productId,
+  });
 
-  factory OrderModel.fromJson(String source) => OrderModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
+        price: json["price"],
+        quantity: json["quantity"],
+        productId: json["productId"],
+      );
 
-  // Helper function to convert string to PaymentMode enum
-  static PaymentMode _paymentMethodFromString(String method) {
-    switch (method) {
-      case 'Card':
-        return PaymentMode.card;
-      case 'Cash':
-        return PaymentMode.cash;
-      case 'Split':
-        return PaymentMode.split;
-      case 'Credit':
-        return PaymentMode.credit;
-      default:
-        return PaymentMode.cash;
-    }
-  }
+  Map<String, dynamic> toJson() => {
+        "price": price,
+        "quantity": quantity,
+        "productId": productId,
+      };
 }

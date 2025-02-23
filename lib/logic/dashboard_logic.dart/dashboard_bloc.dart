@@ -5,9 +5,11 @@ import 'package:pos_app/constatnts/enums.dart';
 import 'package:pos_app/data/api/service.dart';
 import 'package:pos_app/data/api/urls.dart';
 import 'package:pos_app/data/db/customer_db.dart';
+import 'package:pos_app/data/db/order_db.dart';
 import 'package:pos_app/data/db/product_db.dart';
 import 'package:pos_app/data/models/category_model.dart';
 import 'package:pos_app/data/models/customer_model.dart';
+import 'package:pos_app/data/models/orders_model.dart';
 import 'package:pos_app/data/models/product_model.dart';
 import 'package:pos_app/data/models/response_model.dart';
 import 'package:pos_app/widgets/custom_snackbar.dart';
@@ -80,21 +82,8 @@ class DashBoardBloc extends Bloc<DashBoardEvent, DashBoardState> {
       }
 
       // Now fetch updated customer data from the backend
-      ResponseModel response = await ApiService.getApiData(Urls.getAllCustomers);
-
-      if (response.isSuccess) {
-        List<CustomerModel> customersList = List<CustomerModel>.from(response.responseObject['data'].map((x) => CustomerModel.fromJson(x)));
-
-        // Clear and re-store customers in local DB
-        await CustomerDb.customerBox.clear();
-        for (var customer in customersList) {
-          await CustomerDb.storeCustomer(customer);
-        }
-
-        CustomSnackBar.showSuccess(message: "Customer data synchronized successfully!");
-      } else {
-        CustomSnackBar.showError(message: response.errorMessage ?? "Error fetching customers");
-      }
+      fetchCustomerData();
+      fetchOrderData();
     } finally {}
   }
 
@@ -123,34 +112,57 @@ class DashBoardBloc extends Bloc<DashBoardEvent, DashBoardState> {
     }
   }
 
-  // Future<void> _syncLocalCustomersToBackend() async {
-  //   List<CustomerModel> localCustomers = CustomerDb.getAllCustomers();
+  Future<bool> uploadOrder(OrderModel orderModel) async {
+    final response = await ApiService.postApiData(Urls.saveOrder, orderModel.toJson());
 
-  //   for (var customer in localCustomers) {
-  //     bool isEdit = customer.id != 0; // If ID exists, it's an update
+    print("Backend Response: ${response.responseObject}");
 
-  //     try {
-  //       ResponseModel response = await ApiService.postApiData(
-  //         Urls.saveCustomer,
-  //         {
-  //           "id": isEdit ? customer.id : null, // Send ID only if updating
-  //           "isEdit": isEdit,
-  //           "name": customer.name,
-  //           "phone": customer.phone,
-  //           "email": customer.email,
-  //           "gender": customer.gender,
-  //           "address": customer.address,
-  //         },
-  //       );
+    if (response.isSuccess) {
+      print("✅ Order Synced Successfully");
+      return true;
+    } else {
+      print("❌Order Error: ${response.errorMessage}");
+      return false;
+    }
+  }
 
-  //       // If it's a new customer, update local ID with the backend's assigned ID
-  //       if (!isEdit && response.isSuccess) {
-  //         customer.id = response.responseObject['data']['id']; // Extract ID from response
-  //         await CustomerDb.updateCustomer(customerBox.keys.toList().indexOf(customer), customer);
-  //       }
-  //     } catch (e) {
-  //       print("Failed to sync customer ${customer.name}: $e");
-  //     }
-  //   }
-  // }
+  void fetchCustomerData() async {
+    ResponseModel response = await ApiService.getApiData(Urls.getAllCustomers);
+
+    if (response.isSuccess) {
+      List<CustomerModel> customersList = List<CustomerModel>.from(response.responseObject['data'].map((x) => CustomerModel.fromJson(x)));
+
+      // Clear and re-store customers in local DB
+      await CustomerDb.customerBox.clear();
+      for (var customer in customersList) {
+        await CustomerDb.storeCustomer(customer);
+      }
+
+      CustomSnackBar.showSuccess(message: "Customer data synchronized successfully!");
+    } else {
+      CustomSnackBar.showError(message: response.errorMessage ?? "Error fetching customers");
+    }
+  }
+
+  void fetchOrderData() async {
+    List<OrderModel> orderList = OrderDb.getAllOrders();
+    for (var element in orderList) {
+      await uploadOrder(element);
+    }
+    ResponseModel response = await ApiService.getApiData(Urls.getAllOrders);
+
+    if (response.isSuccess) {
+      List<OrderModel> ordersList = List<OrderModel>.from(response.responseObject['data'].map((x) => OrderModel.fromJson(x)));
+
+      // Clear and re-store customers in local DB
+      await OrderDb.orderBox.clear();
+      for (var order in ordersList) {
+        await OrderDb.createCustomerOrder(order);
+      }
+
+      CustomSnackBar.showSuccess(message: "Order data synchronized successfully!");
+    } else {
+      CustomSnackBar.showError(message: response.errorMessage ?? "Error fetching Orders");
+    }
+  }
 }

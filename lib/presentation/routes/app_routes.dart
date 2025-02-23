@@ -18,7 +18,7 @@ GoRouter router = GoRouter(
       pageBuilder: (BuildContext context, GoRouterState state) {
         return getCustomTransition(
           state,
-          const LoginScreen(),
+          LoginScreen(),
         );
       },
     ),
@@ -61,7 +61,7 @@ GoRouter router = GoRouter(
       pageBuilder: (BuildContext context, GoRouterState state) {
         return getCustomTransition(
           state,
-          const LoginScreen(),
+          LoginScreen(),
         );
       },
     ),

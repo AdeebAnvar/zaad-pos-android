@@ -1,18 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 
 import 'package:pos_app/data/models/product_model.dart';
 
 class CartModel {
   final List<CartItemModel> cartItems;
-  final double grandTotal;
+  final double totalCartPrice;
 
-  CartModel({required this.cartItems, required this.grandTotal});
+  CartModel({required this.cartItems, required this.totalCartPrice});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'cartItems': cartItems.map((x) => x.toMap()).toList(),
-      'grandTotal': grandTotal,
+      'cartItems': cartItems.map((x) => x.toJson()).toList(),
+      'totalCartPrice': totalCartPrice,
     };
   }
 
@@ -21,31 +20,26 @@ class CartModel {
       cartItems: map['cartItems'] != null
           ? List<CartItemModel>.from(
               (map['cartItems'] as List).map<CartItemModel>(
-                (x) => CartItemModel.fromMap(x as Map<String, dynamic>),
+                (x) => CartItemModel.fromJson(x as Map<String, dynamic>),
               ),
             )
           : [], // Return an empty list if cartItems is null
-      grandTotal: map['grandTotal'] != null ? map['grandTotal'] as double : 0.0, // Default to 0.0 if grandTotal is null
+      totalCartPrice: map['totalCartPrice'] != null ? map['totalCartPrice'] as double : 0.0, // Default to 0.0 if totalCartPrice is null
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory CartModel.fromJson(String source) => CartModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
 class CartItemModel {
-  final ProductModel product;
   int quantity;
   final double totalPrice;
-
+  ProductModel product;
   CartItemModel({
     this.totalPrice = 0.00,
     required this.product,
     required this.quantity,
   });
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     double priceOfProduct = (product.discountPrice != null && product.unitPrice != null && (product.discountPrice! < product.unitPrice! || product.unitPrice == 0))
         ? product.discountPrice ?? 0
         : product.unitPrice ?? 0;
@@ -56,15 +50,11 @@ class CartItemModel {
     };
   }
 
-  factory CartItemModel.fromMap(Map<String, dynamic> map) {
+  factory CartItemModel.fromJson(Map<String, dynamic> map) {
     return CartItemModel(
       totalPrice: map['total_price'] as double,
       product: ProductModel.fromJson(Map<String, dynamic>.from(map['product'])), // Explicit conversion
       quantity: map['quantity'] as int,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory CartItemModel.fromJson(String source) => CartItemModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

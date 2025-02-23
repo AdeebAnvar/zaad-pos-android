@@ -26,4 +26,12 @@ enum CurrentScreen {
   }
 }
 
-enum PaymentMode { cash, card, credit, split }
+enum PaymentMode {
+  cash(1),
+  card(2),
+  credit(3),
+  split(4);
+
+  final int value;
+  const PaymentMode(this.value);
+}

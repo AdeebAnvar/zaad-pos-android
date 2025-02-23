@@ -1,10 +1,12 @@
+import 'dart:math' show max;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pos_app/constatnts/colors.dart';
-import 'package:pos_app/data/models/cart_model.dart';
-import 'package:pos_app/logic/cart_logic/cart_bloc.dart';
-import 'dart:math' show max;
+import 'package:pos_app/constatnts/colors.dart' show AppColors;
+
 import '../constatnts/styles.dart';
+import '../data/models/cart_model.dart';
+import '../logic/cart_logic/cart_bloc.dart';
 
 class CartProductCard extends StatelessWidget {
   const CartProductCard({super.key, required this.cartItemModel});
@@ -34,17 +36,17 @@ class CartProductCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                cartItemModel.product?.name ?? "",
+                cartItemModel.product.name ?? "",
                 style: AppStyles.getSemiBoldTextStyle(fontSize: 13),
               ),
               SizedBox(height: 5),
               Text(
-                'Unit Price AED ${cartItemModel.product?.unitPrice}',
+                'Unit Price AED ${cartItemModel.product.unitPrice}',
                 style: AppStyles.getRegularTextStyle(fontSize: 11, color: Colors.grey.shade700),
               ),
               SizedBox(height: 5),
               Text(
-                'Discount Price AED ${cartItemModel.product?.discountPrice}',
+                'Discount Price AED ${cartItemModel.product.discountPrice}',
                 style: AppStyles.getRegularTextStyle(fontSize: 11, color: Colors.grey.shade700),
               ),
               SizedBox(height: 5),
@@ -58,8 +60,8 @@ class CartProductCard extends StatelessWidget {
             builder: (context, state) {
               if (state is CartLoadedState) {
                 // Find the item in the cart state
-                final cartItem = state.cart.cartItems!.firstWhere(
-                  (item) => item.product!.id == cartItemModel.product!.id,
+                final cartItem = state.cart.cartItems.firstWhere(
+                  (item) => item.product.id == cartItemModel.product.id,
                   orElse: () => CartItemModel(product: cartItemModel.product, quantity: 0),
                 );
 
@@ -84,9 +86,9 @@ class CartProductCard extends StatelessWidget {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            int newQuantity = max(1, cartItem.quantity! - 1);
+                            int newQuantity = max(1, cartItem.quantity - 1);
                             BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(
-                              product: cartItem.product!,
+                              product: cartItem.product,
                               quantity: newQuantity,
                             ));
                           },
@@ -119,9 +121,9 @@ class CartProductCard extends StatelessWidget {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            int newQuantity = cartItem.quantity! + 1;
+                            int newQuantity = cartItem.quantity + 1;
                             BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(
-                              product: cartItem.product!,
+                              product: cartItem.product,
                               quantity: newQuantity,
                             ));
                           },

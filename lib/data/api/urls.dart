@@ -3,6 +3,7 @@ import 'package:pos_app/data/utils/extensions.dart';
 
 class Urls {
   static dynamic getHeaders() {
+    print('token : ${UserDb.getAuthToken()}');
     var ss = {
       'Content-Type': 'application/json',
       'Authorization': UserDb.getAuthToken().isNullOrEmpty() ? "" : 'Bearer ${UserDb.getAuthToken()}',
@@ -19,4 +20,6 @@ class Urls {
   static String getAllProducts = "${baseUrl}product/get_all_products";
   static String getAllCustomers = "${baseUrl}customer/get_all_customers";
   static String saveCustomer = "${baseUrl}customer/save_customer";
+  static String saveOrder = "${baseUrl}order/saveOrder";
+  static String getAllOrders = "${baseUrl}order/getAllOrders";
 }

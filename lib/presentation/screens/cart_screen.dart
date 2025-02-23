@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,19 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/enums.dart';
 import 'package:pos_app/data/db/cart_db.dart';
-import 'package:pos_app/data/models/cart_model.dart';
 import 'package:pos_app/data/models/customer_model.dart';
-import 'package:pos_app/data/models/orders_model.dart';
 import 'package:pos_app/data/utils/extensions.dart';
 import 'package:pos_app/logic/cart_logic/cart_bloc.dart';
 import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
-import 'package:pos_app/presentation/screens/auth/login.dart';
 import 'package:pos_app/widgets/auto_complete_textfield.dart';
 import 'package:pos_app/widgets/cart_product_Card.dart';
+import 'package:pos_app/data/models/cart_model.dart';
 
 import '../../../constatnts/colors.dart';
 import '../../../constatnts/styles.dart';
 import '../../../widgets/custom_textfield.dart';
+import '../../data/models/orders_model.dart';
 
 class CartView extends StatefulWidget {
   const CartView({super.key});
@@ -71,10 +68,10 @@ class _CartViewState extends State<CartView> {
       }
     }, builder: (context, state) {
       if (state is CartLoadedState) {
-        cashController.addListener(() => updateAmount(cashController, cardController, state.cart.grandTotal ?? 0.0));
-        cardController.addListener(() => updateAmount(cardController, cashController, state.cart.grandTotal ?? 0.0));
+        cashController.addListener(() => updateAmount(cashController, cardController, state.cart.totalCartPrice ?? 0.0));
+        cardController.addListener(() => updateAmount(cardController, cashController, state.cart.totalCartPrice ?? 0.0));
         if (selctedPaymentMode == PaymentMode.cash) {
-          cashController.text = state.cart.grandTotal.toString();
+          cashController.text = state.cart.totalCartPrice.toString();
         }
         return BlocListener<CrmBloc, CrmState>(
           listener: (context, state) {
@@ -83,7 +80,7 @@ class _CartViewState extends State<CartView> {
             }
           },
           child: Scaffold(
-            body: state.cart.cartItems!.isEmpty
+            body: state.cart.cartItems.isEmpty
                 ? SizedBox(
                     height: 400,
                     child: Center(
@@ -111,95 +108,102 @@ class _CartViewState extends State<CartView> {
                       SliverList(
                         delegate: SliverChildListDelegate(
                           [
-                            Hero(
-                              tag: '1',
-                              child: Form(
-                                key: formKey,
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(20)),
-                                  ),
-                                  constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height - 70),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 20),
-                                        Text(
+                            Form(
+                              key: formKey,
+                              child: Container(
+                                // padding: const EdgeInsets.all(16),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(20)),
+                                ),
+                                constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height - 70),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 20),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                        child: Text(
                                           'Items',
                                           style: AppStyles.getMediumTextStyle(fontSize: 17),
                                         ),
-                                        SizedBox(height: 10),
-                                        ListView.builder(
-                                          padding: EdgeInsets.zero,
-                                          shrinkWrap: true,
-                                          physics: const NeverScrollableScrollPhysics(),
-                                          itemCount: state.cart.cartItems!.length,
-                                          itemBuilder: (BuildContext c, int i) {
-                                            return CartProductCard(cartItemModel: state.cart.cartItems![i]);
-                                          },
-                                        ),
-                                        SizedBox(height: 18),
-                                        Divider(),
-                                        SizedBox(height: 18),
-                                        Text(
+                                      ),
+                                      SizedBox(height: 10),
+                                      ListView.builder(
+                                        padding: EdgeInsets.all(16),
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: state.cart.cartItems.length,
+                                        itemBuilder: (BuildContext c, int i) {
+                                          return CartProductCard(cartItemModel: state.cart.cartItems[i]);
+                                        },
+                                      ),
+                                      SizedBox(height: 18),
+                                      Divider(),
+                                      SizedBox(height: 18),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                        child: Text(
                                           'Payment Mode',
                                           style: AppStyles.getMediumTextStyle(fontSize: 17),
                                         ),
-                                        SizedBox(height: 20),
-                                        Container(
-                                          height: 45,
-                                          clipBehavior: Clip.hardEdge,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(10),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                blurRadius: 8,
-                                                color: Colors.black26,
-                                                spreadRadius: 0.1,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: PaymentMode.values.asMap().entries.map((e) {
-                                              return Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      index = e.key;
-                                                      selctedPaymentMode = e.value;
-                                                      setAmount(state.cart.grandTotal);
-                                                    });
-                                                  },
-                                                  child: AnimatedContainer(
-                                                    duration: Duration(milliseconds: 600),
-                                                    height: 45,
-                                                    padding: EdgeInsets.all(10),
-                                                    decoration: BoxDecoration(
-                                                      color: index == e.key ? AppColors.primaryColor : null,
-                                                      border: Border(
-                                                        right: BorderSide(color: e.key == 3 ? Colors.white : Colors.grey),
-                                                      ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      Container(
+                                        margin: const EdgeInsets.all(16.0),
+                                        height: 45,
+                                        clipBehavior: Clip.hardEdge,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              blurRadius: 8,
+                                              color: Colors.black26,
+                                              spreadRadius: 0.1,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: PaymentMode.values.asMap().entries.map((e) {
+                                            return Expanded(
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    index = e.key;
+                                                    selctedPaymentMode = e.value;
+                                                    setAmount(state.cart.totalCartPrice);
+                                                  });
+                                                },
+                                                child: AnimatedContainer(
+                                                  duration: Duration(milliseconds: 600),
+                                                  height: 45,
+                                                  padding: EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    color: index == e.key ? AppColors.primaryColor : null,
+                                                    border: Border(
+                                                      right: BorderSide(color: e.key == 3 ? Colors.white : Colors.grey),
                                                     ),
-                                                    child: Center(
-                                                      child: Text(
-                                                        e.value.name.toUpperCase(),
-                                                        style: AppStyles.getRegularTextStyle(fontSize: 13, color: e.key == index ? Colors.white : null),
-                                                      ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      e.value.name.toUpperCase(),
+                                                      style: AppStyles.getRegularTextStyle(fontSize: 13, color: e.key == index ? Colors.white : null),
                                                     ),
                                                   ),
                                                 ),
-                                              );
-                                            }).toList(),
-                                          ),
+                                              ),
+                                            );
+                                          }).toList(),
                                         ),
-                                        SizedBox(height: 20),
-                                        if (selctedPaymentMode != PaymentMode.credit)
-                                          Row(
+                                      ),
+                                      SizedBox(height: 20),
+                                      if (selctedPaymentMode != PaymentMode.credit)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                          child: Row(
                                             children: [
                                               Expanded(
                                                 child: Material(
@@ -243,228 +247,243 @@ class _CartViewState extends State<CartView> {
                                                 ),
                                             ],
                                           ),
-                                        SizedBox(height: 10),
-                                        Divider(),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          'Customer Details',
-                                          style: AppStyles.getMediumTextStyle(fontSize: 17),
                                         ),
-                                        SizedBox(height: 10),
-                                        Material(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          elevation: 4,
-                                          child: AutoCompleteTextField<CustomerModel>(
-                                            controller: customerPhoneController,
-                                            items: customerList,
-                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                            defaultText: "Customer Phone",
-                                            labelText: 'Customer Phone',
-                                            displayStringFunction: (v) {
-                                              return v.phone ?? "";
-                                            },
-                                            focusNode: customerPhoneFocus,
-                                            onSelected: (customer) {
-                                              setCustomerVariables(customer);
-                                            },
-                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
-                                            onChanged: (value) {
-                                              customerPhoneController.text = value;
-                                            },
-                                            validator: (v) {
-                                              if (!v!.length.isGreaterThanZero()) {
-                                                return "Enter customer Mobile Number";
-                                              }
-                                              return null;
-                                            },
-                                            selectedItems: [customerPhoneController.text],
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Material(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          elevation: 4,
-                                          child: AutoCompleteTextField<CustomerModel>(
-                                            controller: customerNameController,
-                                            items: customerList,
-                                            defaultText: "Customer Name",
-                                            labelText: 'Customer Name',
-                                            displayStringFunction: (v) {
-                                              return v.name ?? "";
-                                            },
-                                            focusNode: customerNameFocus,
-                                            onSelected: (customer) {
-                                              setCustomerVariables(customer);
-                                            },
-                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
-                                            onChanged: (value) {
-                                              customerNameController.text = value;
-                                            },
-                                            validator: (v) {
-                                              if (!v!.length.isGreaterThanZero()) {
-                                                return "Enter customer name";
-                                              }
-                                              return null;
-                                            },
-                                            selectedItems: [customerNameController.text],
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Material(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          elevation: 4,
-                                          child: AutoCompleteTextField<CustomerModel>(
-                                            controller: customerEmailController,
-                                            items: customerList,
-                                            defaultText: "Customer Email",
-                                            labelText: 'Customer Email',
-                                            displayStringFunction: (v) {
-                                              return v.email ?? "";
-                                            },
-                                            focusNode: customerEmailFocus,
-                                            onSelected: (customer) {
-                                              setCustomerVariables(customer);
-                                            },
-                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
-                                            onChanged: (value) {
-                                              customerEmailController.text = value;
-                                            },
-                                            validator: (v) {
-                                              if (!v!.length.isGreaterThanZero()) {
-                                                return "Enter customer Email Id";
-                                              }
-                                              return null;
-                                            },
-                                            selectedItems: [customerEmailController.text],
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Material(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          elevation: 4,
-                                          child: AutoCompleteTextField<CustomerModel>(
-                                            controller: customerAddressController,
-                                            items: customerList,
-                                            defaultText: "Customer Address",
-                                            labelText: 'Customer Address',
-                                            displayStringFunction: (v) {
-                                              return v.address ?? "";
-                                            },
-                                            focusNode: customerAddressFocus,
-                                            onSelected: (customer) {
-                                              setCustomerVariables(customer);
-                                            },
-                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
-                                            onChanged: (value) {
-                                              customerAddressController.text = value;
-                                            },
-                                            selectedItems: [customerAddressController.text],
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Material(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          elevation: 4,
-                                          child: AutoCompleteTextField<String>(
-                                            controller: customerGenderController,
-                                            items: ["Male", "Female"],
-                                            defaultText: "Customer Gender",
-                                            labelText: 'Customer Gender',
-                                            displayStringFunction: (v) {
-                                              return v;
-                                            },
-                                            focusNode: customerGenderFocus,
-                                            onSelected: (customer) {
-                                              customerGenderController.text = customer;
-                                            },
-                                            optionsViewOpenDirection: OptionsViewOpenDirection.up,
-                                            onChanged: (value) {
-                                              customerGenderController.text = value;
-                                            },
-                                            selectedItems: [customerGenderController.text],
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Divider(),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          'Order Details',
-                                          style: AppStyles.getMediumTextStyle(fontSize: 17),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      SizedBox(height: 18),
+                                      Divider(),
+                                      SizedBox(height: 10),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 13),
+                                        color: Colors.grey.shade100,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Items:',
-                                                style: AppStyles.getMediumTextStyle(fontSize: 17),
+                                            SizedBox(height: 18),
+                                            Text(
+                                              'Customer Details',
+                                              style: AppStyles.getMediumTextStyle(fontSize: 17),
+                                            ),
+                                            SizedBox(height: 20),
+                                            Material(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              // elevation: 4,
+                                              child: AutoCompleteTextField<CustomerModel>(
+                                                controller: customerPhoneController,
+                                                items: customerList,
+                                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                                defaultText: "Customer Phone",
+                                                labelText: 'Customer Phone',
+                                                displayStringFunction: (v) {
+                                                  return v.phone ?? "";
+                                                },
+                                                focusNode: customerPhoneFocus,
+                                                onSelected: (customer) {
+                                                  setCustomerVariables(customer);
+                                                },
+                                                optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                                                onChanged: (value) {
+                                                  customerPhoneController.text = value;
+                                                },
+                                                validator: (v) {
+                                                  if (!v!.length.isGreaterThanZero()) {
+                                                    return "Enter customer Mobile Number";
+                                                  }
+                                                  return null;
+                                                },
+                                                selectedItems: [customerPhoneController.text],
                                               ),
                                             ),
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    state.cart.cartItems!.length.toString(),
+                                            SizedBox(height: 10),
+                                            Material(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              // elevation: 4,
+                                              child: AutoCompleteTextField<CustomerModel>(
+                                                controller: customerNameController,
+                                                items: customerList,
+                                                defaultText: "Customer Name",
+                                                labelText: 'Customer Name',
+                                                displayStringFunction: (v) {
+                                                  return v.name ?? "";
+                                                },
+                                                focusNode: customerNameFocus,
+                                                onSelected: (customer) {
+                                                  setCustomerVariables(customer);
+                                                },
+                                                optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                                                onChanged: (value) {
+                                                  customerNameController.text = value;
+                                                },
+                                                validator: (v) {
+                                                  if (!v!.length.isGreaterThanZero()) {
+                                                    return "Enter customer name";
+                                                  }
+                                                  return null;
+                                                },
+                                                selectedItems: [customerNameController.text],
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Material(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              // elevation: 4,
+                                              child: AutoCompleteTextField<CustomerModel>(
+                                                controller: customerEmailController,
+                                                items: customerList,
+                                                defaultText: "Customer Email",
+                                                labelText: 'Customer Email',
+                                                displayStringFunction: (v) {
+                                                  return v.email ?? "";
+                                                },
+                                                focusNode: customerEmailFocus,
+                                                onSelected: (customer) {
+                                                  setCustomerVariables(customer);
+                                                },
+                                                optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                                                onChanged: (value) {
+                                                  customerEmailController.text = value;
+                                                },
+                                                validator: (v) {
+                                                  if (!v!.length.isGreaterThanZero()) {
+                                                    return "Enter customer Email Id";
+                                                  }
+                                                  return null;
+                                                },
+                                                selectedItems: [customerEmailController.text],
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Material(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              // elevation: 4,
+                                              child: AutoCompleteTextField<CustomerModel>(
+                                                controller: customerAddressController,
+                                                items: customerList,
+                                                defaultText: "Customer Address",
+                                                labelText: 'Customer Address',
+                                                displayStringFunction: (v) {
+                                                  return v.address ?? "";
+                                                },
+                                                focusNode: customerAddressFocus,
+                                                onSelected: (customer) {
+                                                  setCustomerVariables(customer);
+                                                },
+                                                optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                                                onChanged: (value) {
+                                                  customerAddressController.text = value;
+                                                },
+                                                selectedItems: [customerAddressController.text],
+                                              ),
+                                            ),
+                                            SizedBox(height: 10),
+                                            Material(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              // elevation: 4,
+                                              child: AutoCompleteTextField<String>(
+                                                controller: customerGenderController,
+                                                items: ["Male", "Female"],
+                                                defaultText: "Customer Gender",
+                                                labelText: 'Customer Gender',
+                                                displayStringFunction: (v) {
+                                                  return v;
+                                                },
+                                                focusNode: customerGenderFocus,
+                                                onSelected: (customer) {
+                                                  customerGenderController.text = customer;
+                                                },
+                                                optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                                                onChanged: (value) {
+                                                  customerGenderController.text = value;
+                                                },
+                                                selectedItems: [customerGenderController.text],
+                                              ),
+                                            ),
+                                            SizedBox(height: 18),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      Divider(),
+                                      SizedBox(height: 10),
+                                      Padding(
+                                          padding: EdgeInsets.all(16),
+                                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                            Text(
+                                              'Order Details',
+                                              style: AppStyles.getMediumTextStyle(fontSize: 17),
+                                            ),
+                                            SizedBox(height: 20),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Items:',
                                                     style: AppStyles.getMediumTextStyle(fontSize: 17),
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20),
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Total:',
-                                                style: AppStyles.getMediumTextStyle(fontSize: 17),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  Column(
+                                                ),
+                                                Expanded(
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
                                                       Text(
-                                                        'AED ${state.cart.grandTotal}',
+                                                        state.cart.cartItems.length.toString(),
                                                         style: AppStyles.getMediumTextStyle(fontSize: 17),
                                                       ),
-                                                      // TextButton(
-                                                      //   onPressed: () => showDiscountDialogue(context),
-                                                      //   style: TextButton.styleFrom(
-                                                      //     padding: EdgeInsets.zero,
-                                                      //   ),
-                                                      //   child: Text(
-                                                      //     "> add discount",
-                                                      //     style: AppStyles.getMediumTextStyle(color: AppColors.stextColor, fontSize: 12),
-                                                      //   ),
-                                                      // ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 30),
-                                      ],
-                                    ),
+                                            SizedBox(height: 20),
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Total:',
+                                                    style: AppStyles.getMediumTextStyle(fontSize: 17),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            'AED ${state.cart.totalCartPrice}',
+                                                            style: AppStyles.getMediumTextStyle(fontSize: 17),
+                                                          ),
+                                                          // TextButton(
+                                                          //   onPressed: () => showDiscountDialogue(context),
+                                                          //   style: TextButton.styleFrom(
+                                                          //     padding: EdgeInsets.zero,
+                                                          //   ),
+                                                          //   child: Text(
+                                                          //     "> add discount",
+                                                          //     style: AppStyles.getMediumTextStyle(color: AppColors.stextColor, fontSize: 12),
+                                                          //   ),
+                                                          // ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 30),
+                                          ]))
+                                    ],
                                   ),
                                 ),
                               ),
@@ -508,7 +527,7 @@ class _CartViewState extends State<CartView> {
                     ),
                   ),
                   SizedBox(width: 5),
-                  if (state.cart.cartItems!.isNotEmpty)
+                  if (state.cart.cartItems.isNotEmpty)
                     Expanded(
                       flex: 2,
                       child: TextButton(
@@ -546,17 +565,18 @@ class _CartViewState extends State<CartView> {
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
+                                      List<OrderItem> orderItemsList = [];
+                                      for (var cartItem in state.cart.cartItems) {
+                                        orderItemsList.add(OrderItem(price: cartItem.totalPrice.toInt(), productId: cartItem.product.id, quantity: cartItem.quantity));
+                                      }
                                       OrderModel orderModel = OrderModel(
-                                        cart: state.cart,
+                                        orderItems: orderItemsList,
                                         discount: 0,
-                                        paymentMethod: selctedPaymentMode,
+                                        paymentMethod: selctedPaymentMode.value.toString(),
                                         cardAmount: double.parse(cardController.text),
                                         cashAmount: double.parse(cashController.text),
-                                        grossTotal: state.cart.grandTotal,
-                                        netTotal: state.cart.grandTotal,
-                                        orderNumber: "ORD-${Random().nextDouble()}",
-                                        orderType: "Counter sale",
-                                        recieptNumber: "REC-${Random().nextDouble()}",
+                                        grossTotal: state.cart.totalCartPrice,
+                                        netTotal: state.cart.totalCartPrice,
                                         customerId: customerList.firstWhereOrNull((e) => e.phone == customerPhoneController.text)?.id ?? 0,
                                       );
                                       CustomerModel customerModel = CustomerModel(
@@ -567,9 +587,9 @@ class _CartViewState extends State<CartView> {
                                         id: customerList.firstWhereOrNull((e) => e.phone == customerPhoneController.text)?.id ?? 0,
                                         phone: customerPhoneController.text,
                                       );
-                                      BlocProvider.of<CartBloc>(context).add(
-                                        SubmitingCartEvent(orderModel: orderModel, customerModel: customerModel),
-                                      );
+                                      context.read<CartBloc>().add(
+                                            SubmitingCartEvent(orderModel: orderModel, customerModel: customerModel),
+                                          );
                                       Navigator.of(context).pop();
                                     },
                                     child: Text('OK'),

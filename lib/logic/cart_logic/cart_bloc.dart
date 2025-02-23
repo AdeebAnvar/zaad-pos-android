@@ -21,11 +21,11 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       if (cartModel == null) {
         await CartDb.addCartItemToLocal(CartItemModel(product: event.product, quantity: 1));
       } else {
-        int existingItemIndex = cartModel.cartItems!.indexWhere((cartItem) => cartItem.product!.id == event.product.id);
+        int existingItemIndex = cartModel.cartItems.indexWhere((cartItem) => cartItem.product.id == event.product.id);
         if (existingItemIndex == -1) {
           await CartDb.addCartItemToLocal(CartItemModel(product: event.product, quantity: 1));
         } else {
-          await CartDb.updateItemFromCartLocal(existingItemIndex, CartItemModel(product: event.product, quantity: cartModel.cartItems![existingItemIndex].quantity! + 1));
+          await CartDb.updateItemFromCartLocal(existingItemIndex, CartItemModel(product: event.product, quantity: cartModel.cartItems[existingItemIndex].quantity + 1));
         }
       }
       cartModel = CartDb.getCartFromLocal();
@@ -36,17 +36,17 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<LoadCartEvent>((event, emit) {
       OrderDb.getAllOrders();
       CartModel? cartModel = CartDb.getCartFromLocal();
-      emit(CartLoadedState(cart: cartModel ?? CartModel(cartItems: [], grandTotal: 0)));
+      emit(CartLoadedState(cart: cartModel ?? CartModel(cartItems: [], totalCartPrice: 0)));
     });
     on<UpdateCartQuantityEvent>((event, emit) {
       CartModel? cartModel = CartDb.getCartFromLocal();
-      cartModel ??= CartModel(cartItems: [], grandTotal: 0.0);
-      int existingItemIndex = cartModel.cartItems!.indexWhere((e) => e.product!.id == event.product.id);
+      cartModel ??= CartModel(cartItems: [], totalCartPrice: 0.0);
+      int existingItemIndex = cartModel.cartItems.indexWhere((e) => e.product.id == event.product.id);
       if (existingItemIndex == -1) {
         CartDb.addCartItemToLocal(CartItemModel(product: event.product, quantity: event.quantity));
       } else {
-        cartModel.cartItems![existingItemIndex].quantity = event.quantity;
-        CartDb.updateItemFromCartLocal(existingItemIndex, cartModel.cartItems![existingItemIndex]);
+        cartModel.cartItems[existingItemIndex].quantity = event.quantity;
+        CartDb.updateItemFromCartLocal(existingItemIndex, cartModel.cartItems[existingItemIndex]);
       }
       cartModel = CartDb.getCartFromLocal();
       emit(CartLoadedState(cart: cartModel!));
