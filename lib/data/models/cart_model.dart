@@ -4,7 +4,7 @@ import 'package:pos_app/data/models/product_model.dart';
 
 class CartModel {
   final List<CartItemModel> cartItems;
-  final double totalCartPrice;
+  double totalCartPrice;
 
   CartModel({required this.cartItems, required this.totalCartPrice});
 
@@ -31,7 +31,7 @@ class CartModel {
 
 class CartItemModel {
   int quantity;
-  final double totalPrice;
+  double totalPrice;
   ProductModel product;
   CartItemModel({
     this.totalPrice = 0.00,

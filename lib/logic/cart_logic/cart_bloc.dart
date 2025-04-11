@@ -45,11 +45,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       if (existingItemIndex == -1) {
         CartDb.addCartItemToLocal(CartItemModel(product: event.product, quantity: event.quantity));
       } else {
-        cartModel.cartItems[existingItemIndex].quantity = event.quantity;
-        CartDb.updateItemFromCartLocal(existingItemIndex, cartModel.cartItems[existingItemIndex]);
+        if (event.quantity < 1) {
+          CartDb.removeItemFromCartLocal(existingItemIndex, cartModel.cartItems[existingItemIndex]);
+        } else {
+          cartModel.cartItems[existingItemIndex].quantity = event.quantity;
+          CartDb.updateItemFromCartLocal(existingItemIndex, cartModel.cartItems[existingItemIndex]);
+        }
       }
       cartModel = CartDb.getCartFromLocal();
-      emit(CartLoadedState(cart: cartModel!));
+      emit(CartLoadedState(cart: cartModel ?? CartModel(cartItems: [], totalCartPrice: 0.00)));
     });
     on<SubmitingCartEvent>((event, emit) async {
       bool haveUser = event.orderModel.customerId != 0;

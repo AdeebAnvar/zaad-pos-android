@@ -177,7 +177,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                     listener: (c, s) {},
                     builder: (context, cartState) {
                       if (cartState is CartLoadedState) {
-                        return cartState.cart.cartItems!.isEmpty
+                        return (cartState.cart?.cartItems!.isEmpty ?? true)
                             ? SizedBox()
                             : Align(
                                 alignment: Alignment.topRight,
@@ -190,7 +190,7 @@ class _SaleWindowScreenState extends State<SaleWindowScreen> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      cartState.cart.cartItems!.length.toString(),
+                                      cartState.cart!.cartItems!.length.toString(),
                                       style: AppStyles.getBoldTextStyle(fontSize: 12, color: Colors.white),
                                     ),
                                   ),

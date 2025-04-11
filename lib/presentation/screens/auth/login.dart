@@ -46,7 +46,12 @@ class LoginScreen extends StatelessWidget {
             children: [
               SizedBox(
                 height: MediaQuery.sizeOf(context).height / 3,
-                child: Center(child: Image.asset('assets/images/png/logo.png')),
+                child: Center(
+                    child: Image.asset(
+                  'assets/images/png/appicon2.webp',
+                  height: 100,
+                  width: 100,
+                )),
               ),
               Container(
                 height: MediaQuery.sizeOf(context).height / 1.3,
@@ -113,13 +118,15 @@ class LoginScreen extends StatelessWidget {
   }
 
   void showUserCheckDialogue(BuildContext context) {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
     showDialog(
       context: context,
       builder: (c) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         content: Form(
-          key: formKey,
+          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -132,7 +139,7 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 20),
               TextButton(
                 onPressed: () {
-                  if (formKey.currentState!.validate()) {
+                  if (_formKey.currentState!.validate()) {
                     c.pop();
                     BlocProvider.of<AuthBloc>(context).add(
                       CheckUserOnServer(context: context, userName: userNameController.text, password: passWordController.text),

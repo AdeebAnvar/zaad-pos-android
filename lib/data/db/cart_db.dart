@@ -15,6 +15,10 @@ class CartDb {
     await cartBox.putAt(index, cartItemModel.toJson());
   }
 
+  static removeItemFromCartLocal(int index, CartItemModel cartItemModel) async {
+    await cartBox.deleteAt(index);
+  }
+
   static CartModel? getCartFromLocal() {
     if (cartBox.isNotEmpty) {
       print(cartBox.values);

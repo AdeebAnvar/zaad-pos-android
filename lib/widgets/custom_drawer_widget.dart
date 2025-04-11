@@ -34,7 +34,7 @@ class CustomDrawerWidget extends StatelessWidget {
       padding: EdgeInsets.only(top: 28, left: 14, right: 14, bottom: 14),
       child: Column(children: [
         Hero(
-          tag: 'assets/images/png/logo.png',
+          tag: 'assets/images/png/appicon2.webp',
           child: Padding(
             padding: const EdgeInsets.all(7.0),
             child: Container(
@@ -45,7 +45,7 @@ class CustomDrawerWidget extends StatelessWidget {
               child: Image.asset(
                 height: 45,
                 width: 45,
-                'assets/images/png/logo.png',
+                'assets/images/png/appicon2.webp',
               ),
             ),
           ),

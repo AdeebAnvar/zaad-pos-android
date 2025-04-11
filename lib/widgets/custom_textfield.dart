@@ -114,7 +114,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: _focusNode.hasFocus ? AppColors.primaryColor : Colors.white,
+              color: AppColors.primaryColor,
               width: 1.5,
             ),
           ),

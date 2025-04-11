@@ -49,19 +49,19 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: AppColors.primaryColor,
           appBarTheme: AppBarTheme(
-            backgroundColor: Colors.transparent,
+            backgroundColor: AppColors.primaryColor,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             iconTheme: IconThemeData(color: AppColors.primaryColor),
           ),
-          dialogBackgroundColor: Colors.white,
           bottomSheetTheme: BottomSheetThemeData(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.scaffoldColor,
             surfaceTintColor: Colors.transparent,
           ),
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
           scaffoldBackgroundColor: AppColors.scaffoldColor,
           useMaterial3: true,
+          dialogTheme: DialogThemeData(backgroundColor: AppColors.scaffoldColor),
         ),
       ),
     );

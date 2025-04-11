@@ -96,4 +96,5 @@ class ScaleSize {
     return max(1, min(val, maxTextScaleFactor));
   }
 }
+
 // List of various text styles used within the app
