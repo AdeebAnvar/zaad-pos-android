@@ -53,4 +53,6 @@ class OrderDb {
         .toList();
     return orders;
   }
+
+  static Future<void> clearOrderDb() async => await orderBox.clear();
 }

@@ -43,4 +43,7 @@ class ProductDb {
       return ProductModel.fromJson(productMap);
     }).toList();
   }
+
+  static Future<void> clearProductDb() async => await productBox.clear();
+  static Future<void> clearProductCategoryDb() async => await productCategoryBox.clear();
 }

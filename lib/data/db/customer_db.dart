@@ -33,4 +33,6 @@ class CustomerDb {
   static CustomerModel? getSingleCustomer(int id) {
     return customerBox.get(id);
   }
+
+  static Future<void> clearCustomerDb() async => await customerBox.clear();
 }

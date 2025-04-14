@@ -113,10 +113,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.primaryColor,
-              width: 1.5,
-            ),
+            border: Border.all(width: 1.5, color: Colors.black26),
           ),
           child: IntrinsicHeight(
             child: Row(
@@ -133,18 +130,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if ((widget.showAsUpperLabel ?? true) && widget.labelText != null && widget.labelText!.isNotEmpty && value.text.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10.0, top: 5),
-                          child: Text(
-                            textAlign: TextAlign.start,
-                            widget.labelText!,
-                            style: AppStyles.getRegularTextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
-                        ),
                       TextFormField(
                         onTapOutside: (event) => hideKeyboard(),
                         autofillHints: widget.autofillHints,
@@ -171,6 +156,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         textAlign: widget.textAlign ?? TextAlign.start,
                         decoration: InputDecoration(
                           labelStyle: TextStyle(
+                            color: AppColors.hintFontColor,
                             fontSize: widget.hintFontSize ?? 14,
                             fontWeight: FontWeight.w400,
                           ),
@@ -179,20 +165,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
                           counterText: widget.counterText,
                           fillColor: widget.fillColor ?? Colors.white,
                           hintStyle: TextStyle(
+                            color: AppColors.hintFontColor,
                             fontSize: widget.hintFontSize ?? 14,
                             fontWeight: FontWeight.w400,
                           ),
                           isDense: true,
                           isCollapsed: true,
-                          contentPadding: widget.contentPadding ??
-                              EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: (value.text.isEmpty)
-                                    ? 15
-                                    : (widget.showAsUpperLabel ?? true)
-                                        ? 4
-                                        : 15,
-                              ),
+                          contentPadding: widget.contentPadding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 13),
                           suffix: widget.suffix,
                           prefix: widget.prefix,
                           errorText: widget.errorText,

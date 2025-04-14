@@ -36,7 +36,5 @@ class CartDb {
     }
   }
 
-  static clearDb() async {
-    await cartBox.clear();
-  }
+  static clearCartDb() async => await cartBox.clear();
 }

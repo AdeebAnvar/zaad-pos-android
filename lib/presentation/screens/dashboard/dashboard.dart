@@ -4,13 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/enums.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
-import 'package:pos_app/presentation/screens/auth/login.dart';
-import 'package:pos_app/presentation/screens/dashboard/credit_sales.dart';
 import 'package:pos_app/presentation/screens/dashboard/crm.dart';
-import 'package:pos_app/presentation/screens/dashboard/day_closing.dart';
-import 'package:pos_app/presentation/screens/dashboard/payback_screen.dart';
-import 'package:pos_app/presentation/screens/dashboard/recent_sales.dart';
 import 'package:pos_app/presentation/screens/dashboard/sale_window.dart';
+import 'package:pos_app/presentation/screens/dashboard/settings_screen.dart';
 import 'package:pos_app/widgets/custom_drawer_widget.dart';
 import 'package:pos_app/widgets/custom_textfield.dart';
 
@@ -34,16 +30,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   final screens = [
     Container(),
-    const CrmScreen(),
-    const SaleWindowScreen(),
-    const RecentSalesHistory(),
-    const CreditSalesHistory(),
-    const DayClosingScreen(),
-    Container(),
-    const PaybackScreen(),
+    ResponsiveWrapper(child: CrmScreen()),
+    SaleWindowScreen(),
+    // ResponsiveWrapper(child: RecentSalesHistory()),
+    // ResponsiveWrapper(child: CreditSalesHistory()),
+    // ResponsiveWrapper(child: DayClosingScreen()),
+    // Container(),
+    // ResponsiveWrapper(child: PaybackScreen()),
+    ResponsiveWrapper(child: SettingsScreen()),
   ];
 
-  final screenTitles = ['', 'CRM', 'Sale', 'Sale History', 'Credit Sales History', 'Day Closing', '', 'Pay Back'];
+  final screenTitles = ['', 'CRM', 'Sale', 'Settings'];
 
   @override
   void initState() {
@@ -62,10 +59,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
     return BlocConsumer<DashBoardBloc, DashBoardState>(
       bloc: _dashBoardBloc,
       listener: (context, state) {
-        print(state);
         if (state is DashBoardSuccessState) {
           selectedDrawerIndex = state.index;
         }
@@ -79,58 +78,72 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
       },
       builder: (context, state) {
         return Scaffold(
-            appBar: AppBar(
-              title: Text(
-                screenTitles[selectedDrawerIndex].toString(),
-                style: AppStyles.getSemiBoldTextStyle(fontSize: 16, color: Colors.white),
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: Text(
+              screenTitles[selectedDrawerIndex],
+              style: AppStyles.getSemiBoldTextStyle(
+                fontSize: isMobile ? 14 : 18,
+                color: Colors.white,
               ),
-              backgroundColor: AppColors.primaryColor,
-              toolbarHeight: 70,
-              actions: [
-                AnimatedCrossFade(
-                  firstChild: Text(""),
-                  secondChild: Text(
-                    CurrentScreen.fromIndex(selectedDrawerIndex).syncMessage,
-                    style: AppStyles.getSemiBoldTextStyle(fontSize: 14, color: Colors.white),
-                  ),
-                  crossFadeState: isAnimating ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                  duration: Duration(
-                    milliseconds: 800,
-                  ),
-                ),
-                RotationTransition(
-                  turns: _controller,
-                  child: IconButton(
-                    onPressed: () async {
-                      _controller.repeat();
-                      _dashBoardBloc.add(
-                        SyncDataEvent(screen: CurrentScreen.fromIndex(selectedDrawerIndex)),
-                      );
-                    },
-                    icon: Icon(
-                      Icons.sync,
-                      color: Colors.white,
+            ),
+            backgroundColor: AppColors.primaryColor,
+            toolbarHeight: isMobile ? 60 : 70,
+            leading: InkWell(
+              onTap: () => scaffoldKey.currentState?.openDrawer(),
+              child: Icon(Icons.menu, color: Colors.white, size: isMobile ? 22 : 28),
+            ),
+            actions: [
+              if (isAnimating)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Center(
+                    child: Text(
+                      CurrentScreen.fromIndex(selectedDrawerIndex).syncMessage,
+                      style: AppStyles.getSemiBoldTextStyle(
+                        fontSize: isMobile ? 12 : 14,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ],
-              leading: InkWell(onTap: () => scaffoldKey.currentState?.openDrawer(), child: Icon(Icons.menu, color: Colors.white)),
-            ),
-            key: scaffoldKey,
-            drawer: CustomDrawerWidget(
-              index: selectedDrawerIndex,
-              onClick: (i) {
-                context.pop();
-                if (i == 0) {
-                  showOpeningBalanceSheet(context);
-                } else if (i == 7) {
-                  showOpeningBalanceSheet(context);
-                } else {
-                  _dashBoardBloc.add(DashbBoardChangeIndexDrawer(index: i!));
-                }
-              },
-            ),
-            body: screens[selectedDrawerIndex]);
+              RotationTransition(
+                turns: _controller,
+                child: IconButton(
+                  onPressed: () {
+                    _controller.repeat();
+                    _dashBoardBloc.add(
+                      SyncDataEvent(screen: CurrentScreen.fromIndex(selectedDrawerIndex)),
+                    );
+                  },
+                  icon: Icon(Icons.sync, color: Colors.white, size: isMobile ? 22 : 28),
+                ),
+              ),
+            ],
+          ),
+          drawer: CustomDrawerWidget(
+            index: selectedDrawerIndex,
+            onClick: (i) {
+              context.pop();
+              if (i == 0 || i == 7) {
+                showOpeningBalanceSheet(context);
+              } else {
+                _dashBoardBloc.add(DashbBoardChangeIndexDrawer(index: i!));
+              }
+            },
+          ),
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 8.0 : 16.0,
+                  vertical: isMobile ? 8.0 : 12.0,
+                ),
+                child: screens[selectedDrawerIndex],
+              );
+            },
+          ),
+        );
       },
     );
   }
@@ -196,6 +209,22 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
           ),
         );
       },
+    );
+  }
+}
+
+class ResponsiveWrapper extends StatelessWidget {
+  final Widget child;
+
+  const ResponsiveWrapper({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: width < 600 ? 8.0 : 24.0),
+      child: child,
     );
   }
 }

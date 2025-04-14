@@ -17,7 +17,11 @@ class HiveDb {
   }
 
   static clearDb() async {
-    await Hive.deleteFromDisk();
-    await initHive();
+    await UserDb.clearUserDb();
+    await CustomerDb.clearCustomerDb();
+    await OrderDb.clearOrderDb();
+    await ProductDb.clearProductDb();
+    await ProductDb.clearProductCategoryDb();
+    await CartDb.clearCartDb();
   }
 }

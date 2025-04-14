@@ -69,7 +69,7 @@ class _CartViewState extends State<CartView> {
     return BlocConsumer<CartBloc, CartState>(listener: (c, s) {
       if (s is CartSubmittedState) {
         context.pop();
-        CartDb.clearDb();
+        CartDb.clearCartDb();
       }
     }, builder: (c, state) {
       if (state is CartLoadedState) {

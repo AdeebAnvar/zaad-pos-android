@@ -36,4 +36,6 @@ class UserDb {
     }
     return null;
   }
+
+  static Future<void> clearUserDb() async => await _userBox.clear();
 }
