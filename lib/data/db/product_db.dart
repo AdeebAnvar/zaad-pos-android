@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:pos_app/constatnts/utils/image_utils.dart';
 import 'package:pos_app/data/models/category_model.dart';
 import 'package:pos_app/data/models/product_model.dart';
 
@@ -24,6 +25,14 @@ class ProductDb {
 // STORE PRODUCTS
   static storeProducts(List<ProductModel> productsList) async {
     for (var product in productsList) {
+      // Download the image if it's not already saved locally
+      if (product.image != null && product.localImagePath == null) {
+        final fileName = '${product.id}.jpg';
+        final localPath = await ImageUtils().downloadProductImage(product.image!, fileName);
+        product.localImagePath = localPath; // Save the local image path
+      }
+
+      // Store the product in local storage
       await productBox.put(product.id, product.toJson());
     }
   }

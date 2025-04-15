@@ -50,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: LayoutBuilder(builder: (context, constarints) {
         return BlocConsumer<AuthBloc, AuthState>(
@@ -143,49 +144,51 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _mobileView() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Image.asset(
-              'assets/images/png/appicon2.webp',
-              height: 100,
-              width: 100,
-            ),
-          ),
-          SizedBox(height: 24),
-          Text(
-            'Zaad Platforms',
-            style: AppStyles.getBoldTextStyle(fontSize: 20),
-          ),
-          SizedBox(height: 24),
-          Text(
-            'Login',
-            style: AppStyles.getMediumTextStyle(fontSize: 14),
-          ),
-          SizedBox(height: 24),
-          loginForm(),
-          SizedBox(height: 12),
-          CustomResponsiveButton(onPressed: login, text: "Login"),
-          SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Connect with server',
-                style: AppStyles.getMediumTextStyle(fontSize: 14),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(top: 16.0, left: 16, right: 16, bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: Image.asset(
+                'assets/images/png/appicon2.webp',
+                height: 100,
+                width: 100,
               ),
-              SizedBox(width: 10),
-              CustomSwitch(
-                  value: connectToServer,
-                  onChanged: (v) {
-                    setState(() => connectToServer = !connectToServer);
-                  }),
-            ],
-          )
-        ],
+            ),
+            SizedBox(height: 24),
+            Text(
+              'Zaad Platforms',
+              style: AppStyles.getBoldTextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 24),
+            Text(
+              'Login',
+              style: AppStyles.getMediumTextStyle(fontSize: 14),
+            ),
+            SizedBox(height: 24),
+            loginForm(),
+            SizedBox(height: 12),
+            CustomResponsiveButton(onPressed: login, text: "Login"),
+            SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Connect with server',
+                  style: AppStyles.getMediumTextStyle(fontSize: 14),
+                ),
+                SizedBox(width: 10),
+                CustomSwitch(
+                    value: connectToServer,
+                    onChanged: (v) {
+                      setState(() => connectToServer = !connectToServer);
+                    }),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

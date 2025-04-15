@@ -4,16 +4,24 @@ import 'package:pos_app/widgets/custom_loading.dart';
 
 class CustomDialog {
   static bool _isShowing = false;
+  static final ValueNotifier<String> _loadingTextNotifier = ValueNotifier('Loading...');
 
   static void showLoading(BuildContext context, {required String loadingText}) {
     if (_isShowing) return;
     _isShowing = true;
+    _loadingTextNotifier.value = loadingText;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => _LoadingDialogContent(loadingText: loadingText),
+      builder: (_) => _LoadingDialogContent(),
     );
+  }
+
+  static void updateLoadingText(String newText) {
+    if (_isShowing) {
+      _loadingTextNotifier.value = newText;
+    }
   }
 
   static void hideLoading(BuildContext context) {
@@ -71,8 +79,8 @@ class CustomDialog {
 }
 
 class _LoadingDialogContent extends StatelessWidget {
-  const _LoadingDialogContent({super.key, this.loadingText = 'Loading...'});
-  final String loadingText;
+  const _LoadingDialogContent();
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -84,19 +92,25 @@ class _LoadingDialogContent extends StatelessWidget {
       elevation: 10,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-          width: dialogWidth,
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomLoading(),
-              SizedBox(height: 8),
-              Text(
-                loadingText,
-                style: AppStyles.getMediumTextStyle(fontSize: 12),
-              )
-            ],
-          )),
+        width: dialogWidth,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomLoading(),
+            SizedBox(height: 8),
+            ValueListenableBuilder<String>(
+              valueListenable: CustomDialog._loadingTextNotifier,
+              builder: (context, value, _) {
+                return Text(
+                  value,
+                  style: AppStyles.getMediumTextStyle(fontSize: 12),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

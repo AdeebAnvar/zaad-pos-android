@@ -1,16 +1,8 @@
-// To parse this JSON data, do
-//
-//     final productModel = productModelFromJson(jsonString);
-
-import 'dart:convert';
-
-List<ProductModel> productModelFromJson(String str) => List<ProductModel>.from(json.decode(str).map((x) => ProductModel.fromJson(x)));
-
-String productModelToJson(List<ProductModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
-
 class ProductModel {
   int? id;
   String? name;
+  String? image;
+  String? localImagePath; // New field to store local image path
   int? categoryId;
   String? categoryNameEng;
   String? categoryNameArabic;
@@ -20,6 +12,8 @@ class ProductModel {
   ProductModel({
     this.id,
     this.name,
+    this.image,
+    this.localImagePath, // Add this here
     this.categoryId,
     this.categoryNameEng,
     this.categoryNameArabic,
@@ -30,6 +24,8 @@ class ProductModel {
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
         id: json["id"],
         name: json["name"],
+        image: json['image'],
+        localImagePath: json["local_image_path"], // For local path
         categoryId: json["category_id"],
         categoryNameEng: json["category_name_eng"],
         categoryNameArabic: json["category_name_arabic"],
@@ -41,6 +37,8 @@ class ProductModel {
         "id": id,
         "name": name,
         "category_id": categoryId,
+        'image': image,
+        "local_image_path": localImagePath, // Store the local path
         "category_name_eng": categoryNameEng,
         "category_name_arabic": categoryNameArabic,
         "unit_price": unitPrice,

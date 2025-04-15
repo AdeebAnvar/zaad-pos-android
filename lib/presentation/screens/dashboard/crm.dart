@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pos_app/constatnts/app_responsive.dart';
 import 'package:pos_app/constatnts/colors.dart';
 import 'package:pos_app/constatnts/styles.dart';
 import 'package:pos_app/data/models/customer_model.dart';
@@ -31,76 +32,82 @@ class _CrmScreenState extends State<CrmScreen> {
     return BlocConsumer<CrmBloc, CrmState>(
       listener: (context, state) {},
       builder: (context, state) {
+        print('kjdsfoi  $state');
         if (state is CrmScreenLoadingSuccessState) {
-          return Scaffold(
-            body: RefreshIndicator(
-              onRefresh: () async {
-                BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
-              },
-              child: ListView(
-                padding: EdgeInsets.all(14),
-                children: [
-                  AutoCompleteTextField<CustomerModel>(
-                    items: state.customersList,
-                    controller: customerData,
-                    displayStringFunction: (v) {
-                      return v.name ?? "";
+          return AppResponsive.isDesktop(context)
+              ? Column(
+                  children: [],
+                )
+              : Scaffold(
+                  body: RefreshIndicator(
+                    onRefresh: () async {
+                      BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
                     },
-                    searchFunction: (customer) => [
-                      customer.phone ?? "",
-                      customer.name ?? "",
-                      customer.email ?? "",
-                    ],
-                    onSelected: (customer) {
-                      BlocProvider.of<CrmBloc>(context).add(SelectCustomerEvent(selectedCustomer: customer));
-                    },
-                    onChanged: (value) {
-                      BlocProvider.of<CrmBloc>(context).add(SearchCustomersEvent(searchQuery: value));
-                    },
-                    defaultText: "Search Customer",
-                    labelText: "Search Customer",
-                  ),
-                  SizedBox(height: 15),
-                  if (state.customersList.isEmpty)
-                    Center(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("No Data Found Please sync"),
-                        TextButton(
-                            onPressed: () {
-                              BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
-                            },
-                            child: Text("Refresh"))
-                      ],
-                    ))
-                  else
-                    ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
+                    child: ListView(
                       shrinkWrap: true,
-                      itemCount: state.filteredCustomersList.length,
-                      itemBuilder: (c, i) {
-                        return CustomerCard(customerModel: state.customersList[i]);
-                      },
+                      padding: EdgeInsets.all(14),
+                      children: [
+                        AutoCompleteTextField<CustomerModel>(
+                          items: state.customersList,
+                          controller: customerData,
+                          displayStringFunction: (v) {
+                            return v.name ?? "";
+                          },
+                          searchFunction: (customer) => [
+                            customer.phone ?? "",
+                            customer.name ?? "",
+                            customer.email ?? "",
+                          ],
+                          onSelected: (customer) {
+                            BlocProvider.of<CrmBloc>(context).add(SelectCustomerEvent(selectedCustomer: customer));
+                          },
+                          onChanged: (value) {
+                            BlocProvider.of<CrmBloc>(context).add(SearchCustomersEvent(searchQuery: value));
+                          },
+                          defaultText: "Search Customer",
+                          labelText: "Search Customer",
+                        ),
+                        SizedBox(height: 15),
+                        if (state.customersList.isEmpty)
+                          Center(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("No Data Found Please sync"),
+                              TextButton(
+                                  onPressed: () {
+                                    BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
+                                  },
+                                  child: Text("Refresh"))
+                            ],
+                          ))
+                        else
+                          ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: state.filteredCustomersList.length,
+                            itemBuilder: (c, i) {
+                              return CustomerCard(customerModel: state.customersList[i]);
+                            },
+                          ),
+                      ],
                     ),
-                ],
-              ),
-            ),
-            bottomNavigationBar: Container(
-              padding: EdgeInsets.all(10),
-              height: 70,
-              child: ElevatedButton(
-                onPressed: () => showCustomerCreationSheet(context),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    )),
-                child: Text("Create Customer"),
-              ),
-            ),
-          );
+                  ),
+                  bottomNavigationBar: Container(
+                    padding: EdgeInsets.all(10),
+                    height: 70,
+                    child: ElevatedButton(
+                      onPressed: () => showCustomerCreationSheet(context),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          )),
+                      child: Text("Create Customer"),
+                    ),
+                  ),
+                );
         } else {
           return Center(
               child: Column(

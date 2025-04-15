@@ -22,4 +22,5 @@ class Urls {
   static String saveCustomer = "${baseUrl}customer/save_customer";
   static String saveOrder = "${baseUrl}order/saveOrder";
   static String getAllOrders = "${baseUrl}order/getAllOrders";
+  static String saveProduct = "${baseUrl}product/save_product";
 }

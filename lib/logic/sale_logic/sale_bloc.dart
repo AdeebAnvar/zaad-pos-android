@@ -12,6 +12,7 @@ class SaleBloc extends Bloc<SaleEvent, SaleState> {
     List<ProductModel> productsList = [];
     on<LoadProductsEvent>((event, emit) {
       try {
+        emit(SaleLoadingState());
         categoryList = ProductDb.getCategories();
         productsList = ProductDb.getProducts();
         categoryList.insert(0, CategoryModel(id: 0, categoryNameEng: "All", categoryNameArabic: ""));

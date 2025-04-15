@@ -8,6 +8,13 @@ import 'package:pos_app/presentation/screens/auth/login.dart';
 import 'package:pos_app/widgets/custom_button.dart';
 import 'package:pos_app/widgets/custom_dialogue.dart';
 
+List<DrawerButton> drawerButtons = [
+  DrawerButton(icon: "assets/images/svg/openingbal.svg", title: "Opening Balance"),
+  DrawerButton(icon: "assets/images/svg/CRM.svg", title: "CRM"),
+  DrawerButton(icon: "assets/images/svg/sale.svg", title: "Sale Window"),
+  DrawerButton(icon: "assets/images/svg/settings.svg", title: "Settings"),
+];
+
 class CustomDrawerWidget extends StatelessWidget {
   const CustomDrawerWidget({super.key, this.index = 1, required this.onClick});
   final int index;
@@ -15,13 +22,6 @@ class CustomDrawerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<DrawerButton> drawerButtons = [
-      DrawerButton(icon: "assets/images/svg/openingbal.svg", title: "Opening Balance"),
-      DrawerButton(icon: "assets/images/svg/CRM.svg", title: "CRM"),
-      DrawerButton(icon: "assets/images/svg/sale.svg", title: "Sale Window"),
-      DrawerButton(icon: "assets/images/svg/settings.svg", title: "Settings"),
-    ];
-
     return Container(
       width: MediaQuery.of(context).size.width.clamp(250.0, 350.0),
       decoration: const BoxDecoration(
@@ -132,6 +132,7 @@ class DrawerItem extends StatelessWidget {
   final String icon;
   final bool isSelected;
   final VoidCallback onTap;
+  final void Function(bool)? onHover;
   final Color? backgroundColor;
   final Color? textColor;
   final Widget? iconWidget;
@@ -142,6 +143,7 @@ class DrawerItem extends StatelessWidget {
     required this.icon,
     required this.isSelected,
     required this.onTap,
+    this.onHover,
     this.backgroundColor,
     this.textColor,
     this.iconWidget,
@@ -154,6 +156,7 @@ class DrawerItem extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
+      onHover: onHover,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.all(5),

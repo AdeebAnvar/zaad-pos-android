@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/constatnts/styles.dart';
@@ -17,34 +19,33 @@ class ProductCard extends StatelessWidget {
     return InkWell(
       onTap: () => BlocProvider.of<CartBloc>(context).add(AddToCartEvent(product: product)),
       child: Container(
-        height: 70,
-        padding: const EdgeInsets.symmetric(horizontal: 13),
-        margin: const EdgeInsets.symmetric(vertical: 5),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: const <BoxShadow>[
-            BoxShadow(
-              blurRadius: 8,
-              color: Colors.black26,
-              spreadRadius: 0.1,
+          height: 70,
+          padding: const EdgeInsets.symmetric(horizontal: 13),
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                blurRadius: 8,
+                color: Colors.black26,
+                spreadRadius: 0.1,
+              ),
+            ],
+          ),
+          child: Center(
+            child: ListTile(
+              title: Text(
+                product.name ?? "",
+                style: AppStyles.getMediumTextStyle(fontSize: 13),
+              ),
+              subtitle: Text(
+                "AED ${product.discountPrice ?? product.unitPrice ?? ""}",
+                style: AppStyles.getMediumTextStyle(fontSize: 13),
+              ),
+              leading: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.file(File(product.localImagePath!))),
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Text(
-              product.name ?? "",
-              style: AppStyles.getRegularTextStyle(fontSize: 13),
-            ),
-            Text(
-              'AED ${(product.discountPrice ?? 0) == 0 || (product.discountPrice ?? 0) <= (product.unitPrice ?? 0) ? (product.unitPrice ?? 0) : (product.discountPrice ?? 0)}',
-              style: AppStyles.getRegularTextStyle(fontSize: 13),
-            ),
-          ],
-        ),
-      ),
+          )),
     );
   }
 }

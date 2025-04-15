@@ -7,23 +7,9 @@ class DashBoardInitialState extends DashBoardState {}
 
 class DashBoardLoadingState extends DashBoardState {}
 
-class DashBoardSuccessState extends DashBoardState {
+class DashbBoardChangeIndexSuccessDrawer extends DashBoardState {
   int index;
-  DashBoardSuccessState({
+  DashbBoardChangeIndexSuccessDrawer({
     required this.index,
-  });
-}
-
-class SyncDataLoadingState extends DashBoardState {
-  bool isAnimating;
-  SyncDataLoadingState({
-    required this.isAnimating,
-  });
-}
-
-class SyncDataSuccessState extends DashBoardState {
-  bool isAnimating;
-  SyncDataSuccessState({
-    required this.isAnimating,
   });
 }

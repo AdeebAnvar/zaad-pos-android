@@ -14,173 +14,152 @@ class CartProductCard extends StatelessWidget {
   final CartItemModel cartItemModel;
 
   @override
-  build(BuildContext context) {
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 600;
+
     return Container(
-      padding: const EdgeInsets.all(0),
-      margin: const EdgeInsets.symmetric(vertical: 0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Stack(
-        children: [
-          Dismissible(
-            background: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.delete,
-                  color: Colors.red.shade600,
-                  size: 24,
-                ),
-                SizedBox(width: 3),
-                Text(
-                  'Delete',
-                  style: AppStyles.getMediumTextStyle(fontSize: 14),
-                )
-              ],
-            ),
-            key: Key(cartItemModel.product.id.toString()),
-            onDismissed: (d) {
-              BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(product: cartItemModel.product, quantity: 0));
-              CustomSnackBar.showSuccess(message: "${cartItemModel.product.name} deleted");
-            },
-            child: Container(
-              // height: 80,
-              padding: const EdgeInsets.all(13),
-              margin: const EdgeInsets.symmetric(vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 8,
-                    color: Colors.black26,
-                    spreadRadius: 0.1,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        cartItemModel.product.name ?? "",
-                        style: AppStyles.getSemiBoldTextStyle(fontSize: 13),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'Unit Price AED ${cartItemModel.product.unitPrice}',
-                        style: AppStyles.getRegularTextStyle(fontSize: 11, color: Colors.grey.shade700),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'Discount Price AED ${cartItemModel.product.discountPrice}',
-                        style: AppStyles.getRegularTextStyle(fontSize: 11, color: Colors.grey.shade700),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'total price AED ${cartItemModel.totalPrice}',
-                        style: AppStyles.getSemiBoldTextStyle(fontSize: 11, color: Colors.grey.shade700),
-                      ),
-                    ],
-                  ),
-                  BlocBuilder<CartBloc, CartState>(
-                    builder: (context, state) {
-                      if (state is CartLoadedState) {
-                        // Find the item in the cart state
-                        final cartItem = state.cart!.cartItems.firstWhere(
-                          (item) => item.product.id == cartItemModel.product.id,
-                          orElse: () => CartItemModel(product: cartItemModel.product, quantity: 0),
-                        );
-
-                        return Container(
-                          height: 35,
-                          width: 100,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: const [
-                              BoxShadow(
-                                blurRadius: 8,
-                                color: Colors.black26,
-                                spreadRadius: 0.1,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              // Decrease quantity button
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    int newQuantity = max(0, cartItem.quantity - 1);
-                                    BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(
-                                      product: cartItem.product,
-                                      quantity: newQuantity,
-                                    ));
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(color: AppColors.primaryColor),
-                                    child: Center(
-                                      child: Text(
-                                        '-',
-                                        style: AppStyles.getBoldTextStyle(fontSize: 15, color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              // Quantity display
-                              Expanded(
-                                flex: 2,
-                                child: Container(
-                                  child: Center(
-                                    child: Text(
-                                      cartItem.quantity.toString(),
-                                      style: AppStyles.getRegularTextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              // Increase quantity button
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    int newQuantity = cartItem.quantity + 1;
-                                    BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(
-                                      product: cartItem.product,
-                                      quantity: newQuantity,
-                                    ));
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(color: AppColors.primaryColor),
-                                    child: Center(
-                                      child: Text(
-                                        '+',
-                                        style: AppStyles.getBoldTextStyle(fontSize: 15, color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      return SizedBox.shrink(); // Return an empty if cart is not loaded
-                    },
-                  )
-                ],
-              ),
-            ),
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      child: Dismissible(
+        key: Key(cartItemModel.product.id.toString()),
+        background: Container(
+          alignment: Alignment.center,
+          color: Colors.red.shade50,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.delete, color: Colors.red.shade600, size: isSmallScreen ? 20 : 24),
+              const SizedBox(width: 5),
+              Text('Delete', style: AppStyles.getMediumTextStyle(fontSize: isSmallScreen ? 12 : 14)),
+            ],
           ),
-        ],
+        ),
+        onDismissed: (d) {
+          BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(product: cartItemModel.product, quantity: 0));
+          CustomSnackBar.showSuccess(message: "${cartItemModel.product.name} deleted");
+        },
+        child: Container(
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [BoxShadow(blurRadius: 8, color: Colors.black26)],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Product Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cartItemModel.product.name ?? "",
+                      style: AppStyles.getSemiBoldTextStyle(fontSize: isSmallScreen ? 12 : 14),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Unit Price AED ${cartItemModel.product.unitPrice}',
+                      style: AppStyles.getRegularTextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Discount Price AED ${cartItemModel.product.discountPrice}',
+                      style: AppStyles.getRegularTextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Total Price AED ${cartItemModel.totalPrice}',
+                      style: AppStyles.getSemiBoldTextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey.shade700),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Quantity Modifier
+              BlocBuilder<CartBloc, CartState>(
+                builder: (context, state) {
+                  if (state is CartLoadedState) {
+                    final cartItem = state.cart!.cartItems.firstWhere(
+                      (item) => item.product.id == cartItemModel.product.id,
+                      orElse: () => CartItemModel(product: cartItemModel.product, quantity: 0),
+                    );
+
+                    return Container(
+                      height: isSmallScreen ? 32 : 38,
+                      width: isSmallScreen ? 90 : 100,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: const [BoxShadow(blurRadius: 6, spreadRadius: 3, color: Colors.black26)],
+                      ),
+                      child: Row(
+                        children: [
+                          // Decrease Button
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                final newQuantity = max(0, cartItem.quantity - 1);
+                                BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(
+                                  product: cartItem.product,
+                                  quantity: newQuantity,
+                                ));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(color: AppColors.primaryColor),
+                                child: Center(
+                                  child: Text(
+                                    '-',
+                                    style: AppStyles.getBoldTextStyle(fontSize: isSmallScreen ? 13 : 15, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // Quantity Display
+                          Expanded(
+                            flex: 2,
+                            child: Center(
+                              child: Text(
+                                cartItem.quantity.toString(),
+                                style: AppStyles.getRegularTextStyle(fontSize: isSmallScreen ? 13 : 15),
+                              ),
+                            ),
+                          ),
+
+                          // Increase Button
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                final newQuantity = cartItem.quantity + 1;
+                                BlocProvider.of<CartBloc>(context).add(UpdateCartQuantityEvent(
+                                  product: cartItem.product,
+                                  quantity: newQuantity,
+                                ));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(color: AppColors.primaryColor),
+                                child: Center(
+                                  child: Text(
+                                    '+',
+                                    style: AppStyles.getBoldTextStyle(fontSize: isSmallScreen ? 13 : 15, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

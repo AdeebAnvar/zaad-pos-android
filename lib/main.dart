@@ -7,6 +7,7 @@ import 'package:pos_app/logic/cart_logic/cart_bloc.dart';
 import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
 import 'package:pos_app/logic/sale_logic/sale_bloc.dart';
+import 'package:pos_app/logic/sync_logic/sync_bloc.dart';
 
 import 'presentation/routes/app_routes.dart' as route;
 
@@ -40,6 +41,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<CartBloc>(
           create: (BuildContext context) => CartBloc(),
+        ),
+        BlocProvider<SyncDataBloc>(
+          create: (BuildContext context) => SyncDataBloc(),
         ),
       ],
       child: MaterialApp.router(
