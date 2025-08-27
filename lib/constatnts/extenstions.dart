@@ -22,7 +22,7 @@ extension DynamicExtensions on dynamic {
   }
 
   bool isNullOrEmpty() {
-    return this == null || this!.isEmpty;
+    return this == null || this?.isEmpty;
   }
 }
 

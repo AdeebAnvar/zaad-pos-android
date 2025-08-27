@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/colors.dart';
-import 'package:pos_app/presentation/screens/dashboard/dashboard.dart';
+import 'package:pos_app/presentation/screens/dashboard/counter_sale_dashboard.dart';
+import 'package:pos_app/presentation/screens/dashboard/main_dashboard.dart';
 import 'package:pos_app/widgets/custom_button.dart';
 import 'package:pos_app/widgets/custom_dialogue.dart';
+import 'package:pos_app/widgets/custom_snackbar.dart';
 import 'package:pos_app/widgets/custom_switch_widget.dart';
 
 import '../../../logic/auth_logic/auth_bloc.dart';
@@ -32,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     if (kDebugMode) {
-      userNameController.text = "adibz";
+      userNameController.text = "sales";
       passWordController.text = "1";
     }
   }
@@ -40,11 +42,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     userNameController.dispose();
     passWordController.dispose();
     userNode.dispose();
     passwordNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,21 +54,29 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body: LayoutBuilder(builder: (context, constarints) {
+      body: LayoutBuilder(builder: (c, constarints) {
         return BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is FetchingUserFromServerState || state is CheckingUserOnLocalState) {
-              CustomDialog.showLoading(context, loadingText: 'Checking the user');
-            } else {
-              CustomDialog.hideLoading(context);
-            }
-            if (state is FetchedUserFromServerState) {
-              connectToServer = false;
-            }
-            if (state is CheckedUserOnLocalState) {
-              if (state.userModel != null) {
-                context.goNamed(DashBoardScreen.route);
+          listener: (ct, state) {
+            try {
+              if (state is FetchingUserFromServerState || state is CheckingUserOnLocalState) {
+                CustomDialog.showLoading(context, loadingText: 'Checking the user');
+              } else {
+                CustomDialog.hideLoading(context);
               }
+              if (state is FetchedUserFromServerState) {
+                connectToServer = false;
+              }
+              if (state is CheckedUserOnLocalState) {
+                print(state.userModel?.toMap());
+                if (state.userModel != null) {
+                  // context.pushNamed(DashBoardScreen.route);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const MainDashboard()));
+                } else {
+                  CustomSnackBar.showInfo(message: 'No user found');
+                }
+              }
+            } catch (e) {
+              print('kmf $e');
             }
           },
           builder: (context, state) {
@@ -150,6 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: MediaQuery.of(context).size.height * 3 / 14),
             Center(
               child: Image.asset(
                 'assets/images/png/appicon2.webp',
@@ -194,23 +205,27 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   login() {
-    if (formKey.currentState!.validate()) {
-      if (connectToServer) {
-        BlocProvider.of<AuthBloc>(context).add(
-          CheckUserOnServer(
-            context: context,
-            userName: userNameController.text,
-            password: passWordController.text,
-          ),
-        );
-      } else {
-        BlocProvider.of<AuthBloc>(context).add(
-          CheckUserLocal(
-            userName: userNameController.text,
-            password: passWordController.text,
-          ),
-        );
+    try {
+      if (formKey.currentState!.validate()) {
+        if (connectToServer) {
+          BlocProvider.of<AuthBloc>(context).add(
+            CheckUserOnServer(
+              context: context,
+              userName: userNameController.text,
+              password: passWordController.text,
+            ),
+          );
+        } else {
+          BlocProvider.of<AuthBloc>(context).add(
+            CheckUserLocal(
+              userName: userNameController.text,
+              password: passWordController.text,
+            ),
+          );
+        }
       }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -244,5 +259,14 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+}
+
+class SmapleScreen extends StatelessWidget {
+  const SmapleScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

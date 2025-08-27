@@ -8,15 +8,29 @@ import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
 import 'package:pos_app/logic/sale_logic/sale_bloc.dart';
 import 'package:pos_app/logic/sync_logic/sync_bloc.dart';
+import 'package:pos_app/data/network/network_service.dart';
 
 import 'presentation/routes/app_routes.dart' as route;
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+// ...
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // Initialize network service
+  // await NetworkService().initialize();
+
+  // Initialize Hive database
   await HiveDb.initHive();
+
   runApp(const MyApp());
 }
 
@@ -56,7 +70,17 @@ class MyApp extends StatelessWidget {
             backgroundColor: AppColors.primaryColor,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
-            iconTheme: IconThemeData(color: AppColors.primaryColor),
+            iconTheme: IconThemeData(color: Colors.white),
+          ),
+          fontFamily: 'Poppins',
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: AppColors.primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(8),
+              ),
+            ),
           ),
           bottomSheetTheme: BottomSheetThemeData(
             backgroundColor: AppColors.scaffoldColor,

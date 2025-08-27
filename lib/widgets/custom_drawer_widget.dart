@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/colors.dart';
+import 'package:pos_app/constatnts/common_functions.dart';
 import 'package:pos_app/constatnts/styles.dart';
 import 'package:pos_app/data/db/hive_db.dart';
 import 'package:pos_app/presentation/screens/auth/login.dart';
@@ -34,20 +35,17 @@ class CustomDrawerWidget extends StatelessWidget {
       padding: const EdgeInsets.only(top: 28, left: 14, right: 14, bottom: 14),
       child: Column(
         children: [
-          Hero(
-            tag: 'assets/images/png/appicon2.webp',
-            child: Padding(
-              padding: const EdgeInsets.all(7.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Image.asset(
-                  height: 45,
-                  width: 45,
-                  'assets/images/png/appicon2.webp',
-                ),
+          Padding(
+            padding: const EdgeInsets.all(7.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Image.asset(
+                height: 45,
+                width: 45,
+                'assets/images/png/appicon2.webp',
               ),
             ),
           ),
@@ -72,44 +70,7 @@ class CustomDrawerWidget extends StatelessWidget {
             title: "Logout",
             isSelected: false,
             iconWidget: const Icon(Icons.power_settings_new_rounded, color: Colors.white),
-            onTap: () async {
-              CustomDialog.showResponsiveDialog(
-                context,
-                title: 'Confirm Logout',
-                Column(
-                  children: [
-                    const Text('Are you sure you want to logout?'),
-                    SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                              child: CustomResponsiveButton(
-                                  height: 40,
-                                  textColor: AppColors.textColor,
-                                  elevation: 0,
-                                  backgroundColor: Colors.transparent,
-                                  onPressed: () => Navigator.pop(context, false),
-                                  text: 'Cancel')),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: CustomResponsiveButton(
-                              height: 40,
-                              onPressed: () async {
-                                context.goNamed(LoginScreen.route);
-                                await HiveDb.clearDb();
-                              },
-                              text: 'Logout',
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
+            onTap: () async => await AppFunctions.logout(context),
             backgroundColor: AppColors.primaryColor,
             textColor: Colors.white,
           )
@@ -129,7 +90,7 @@ class DrawerButton {
 
 class DrawerItem extends StatelessWidget {
   final String title;
-  final String icon;
+  final String? icon;
   final bool isSelected;
   final VoidCallback onTap;
   final void Function(bool)? onHover;
@@ -140,7 +101,7 @@ class DrawerItem extends StatelessWidget {
   const DrawerItem({
     Key? key,
     required this.title,
-    required this.icon,
+    this.icon,
     required this.isSelected,
     required this.onTap,
     this.onHover,
@@ -170,7 +131,7 @@ class DrawerItem extends StatelessWidget {
           children: [
             iconWidget ??
                 SvgPicture.asset(
-                  icon,
+                  icon ?? "",
                   height: 30,
                   width: 30,
                   color: fgColor,

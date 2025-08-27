@@ -37,6 +37,33 @@ class OrderModel {
     this.orderItems,
   });
 
+  // Validate order data
+  bool isValid() {
+    if (orderItems == null || orderItems!.isEmpty) {
+      return false;
+    }
+
+    if (grossTotal == null || grossTotal! <= 0) {
+      return false;
+    }
+
+    if (netTotal == null || netTotal! < 0) {
+      return false;
+    }
+
+    if (discount == null || discount! < 0) {
+      return false;
+    }
+
+    // Validate payment amounts
+    double totalPayment = (cardAmount?.toDouble() ?? 0.0) + (cashAmount?.toDouble() ?? 0.0);
+    if (totalPayment < (netTotal?.toDouble() ?? 0.0)) {
+      return false;
+    }
+
+    return true;
+  }
+
   factory OrderModel.fromJson(Map<String, dynamic> json) => OrderModel(
         orderId: json["order_id"],
         customerId: json["customerId"],
@@ -69,7 +96,7 @@ class OrderModel {
 }
 
 class OrderItem {
-  int? price;
+  double? price; // Changed from int to double for better precision
   int? quantity;
   int? productId;
 
@@ -79,8 +106,25 @@ class OrderItem {
     this.productId,
   });
 
+  // Validate order item
+  bool isValid() {
+    if (price == null || price! <= 0) {
+      return false;
+    }
+
+    if (quantity == null || quantity! <= 0) {
+      return false;
+    }
+
+    if (productId == null || productId! <= 0) {
+      return false;
+    }
+
+    return true;
+  }
+
   factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
-        price: json["price"],
+        price: (json["price"] as num?)?.toDouble(), // Convert to double
         quantity: json["quantity"],
         productId: json["productId"],
       );

@@ -21,7 +21,7 @@ class SyncDataBloc extends Bloc<SyncDataEvent, SyncDataState> {
       emit(SyncingSaleDataState());
       await saleWindowData();
       emit(SyncingCrmDataState());
-      await crmData();
+      await syncCrmData();
       emit(SyncSuccessDataState());
     });
   }
@@ -29,7 +29,6 @@ class SyncDataBloc extends Bloc<SyncDataEvent, SyncDataState> {
 
 Future<void> saleWindowData() async {
   ResponseModel productsResponse = await ApiService.getApiData(Urls.getAllProducts);
-  ResponseModel categoryResponse = await ApiService.getApiData(Urls.getAllCategories);
   if (productsResponse.isSuccess) {
     List<ProductModel> productsList = List<ProductModel>.from(productsResponse.responseObject['data'].map((x) {
       return ProductModel.fromJson(x);
@@ -40,8 +39,11 @@ Future<void> saleWindowData() async {
   } else {
     CustomSnackBar.showError(message: productsResponse.errorMessage ?? "");
   }
+  ResponseModel categoryResponse = await ApiService.getApiData(Urls.getAllCategories);
+
   if (categoryResponse.isSuccess) {
     List<CategoryModel> categoryList = List<CategoryModel>.from(categoryResponse.responseObject['data'].map((x) {
+      print('gfpkearou; ${x}');
       return CategoryModel.fromJson(x);
     }));
     ProductDb.storeProductCategories(categoryList);
@@ -52,7 +54,7 @@ Future<void> saleWindowData() async {
 
 // CRM
 
-Future<void> crmData() async {
+Future<void> syncCrmData() async {
   try {
     List<CustomerModel> localCustomers = CustomerDb.getAllCustomers();
     if (localCustomers.isNotEmpty) {
@@ -70,9 +72,10 @@ Future<void> crmData() async {
     }
 
     // Now fetch updated customer data from the backend
-    fetchCustomerData();
-    fetchOrderData();
-  } finally {}
+  } finally {
+    await fetchCustomerData();
+    await fetchOrderData();
+  }
 }
 
 Future<bool> uploadCustomer(CustomerModel customer) async {
@@ -113,7 +116,7 @@ Future<bool> uploadOrder(OrderModel orderModel) async {
   }
 }
 
-void fetchCustomerData() async {
+Future<void> fetchCustomerData() async {
   ResponseModel response = await ApiService.getApiData(Urls.getAllCustomers);
 
   if (response.isSuccess) {
@@ -129,7 +132,7 @@ void fetchCustomerData() async {
   }
 }
 
-void fetchOrderData() async {
+Future<void> fetchOrderData() async {
   List<OrderModel> orderList = OrderDb.getAllOrders();
   for (var element in orderList) {
     await uploadOrder(element);

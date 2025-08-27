@@ -37,3 +37,22 @@ enum PaymentMode {
   final int value;
   const PaymentMode(this.value);
 }
+
+enum UserType {
+  superAdmin(1),
+  mainAdmin(2),
+  branchAdmin(3),
+  counterSales(4);
+
+  final int value;
+  const UserType(this.value);
+}
+
+enum DiscountType {
+  byPercentage(1, 'By Percentage'),
+  byAmount(2, 'By Amount');
+
+  final int value;
+  final String label;
+  const DiscountType(this.value, this.label);
+}

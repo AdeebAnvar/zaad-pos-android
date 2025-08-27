@@ -8,16 +8,21 @@ class SaleStateInitial extends SaleState {}
 class SaleLoadingState extends SaleState {}
 
 class SaleLoadedState extends SaleState {
-  List<ProductModel> products;
-  List<CategoryModel> categories;
+  final List<ProductModel> products;
+  final List<CategoryModel> categories;
+  final int currentCategoryId;
+  final String currentSearchQuery;
+
   SaleLoadedState({
     required this.products,
     required this.categories,
+    this.currentCategoryId = 0,
+    this.currentSearchQuery = '',
   });
 }
 
 class SaleErrorState extends SaleState {
-  String message;
+  final String message;
 
   SaleErrorState({required this.message});
 }

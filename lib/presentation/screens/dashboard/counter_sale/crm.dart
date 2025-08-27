@@ -8,7 +8,9 @@ import 'package:pos_app/constatnts/styles.dart';
 import 'package:pos_app/data/models/customer_model.dart';
 import 'package:pos_app/data/utils/extensions.dart';
 import 'package:pos_app/logic/crm_logic/crm_bloc.dart';
+import 'package:pos_app/presentation/screens/dashboard/counter_sale/customer_details.dart';
 import 'package:pos_app/widgets/auto_complete_textfield.dart';
+import 'package:pos_app/widgets/custom_button.dart';
 import 'package:pos_app/widgets/custom_textfield.dart';
 import 'package:pos_app/widgets/customer_card.dart';
 
@@ -21,11 +23,25 @@ class CrmScreen extends StatefulWidget {
 
 class _CrmScreenState extends State<CrmScreen> {
   TextEditingController customerData = TextEditingController();
+  FocusNode customerNode = FocusNode();
+  List<String> titles = ['sl no', 'Customer', 'Customer purchased Amount', 'Customer Purchased count'];
+
   @override
   void initState() {
     super.initState();
+    print('defs');
     BlocProvider.of<CrmBloc>(context).add(GetAllCustomersEvent());
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    customerData.dispose();
+    customerNode.dispose();
+  }
+
+  int? hoveredRowIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +52,107 @@ class _CrmScreenState extends State<CrmScreen> {
         if (state is CrmScreenLoadingSuccessState) {
           return AppResponsive.isDesktop(context)
               ? Column(
-                  children: [],
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          // height: 40,
+                          // width: 250,
+                          child: AutoCompleteTextField<CustomerModel>(
+                            items: state.customersList,
+                            controller: customerData,
+                            focusNode: customerNode,
+                            displayStringFunction: (v) {
+                              return v.name ?? "";
+                            },
+                            searchFunction: (customer) => [
+                              customer.phone ?? "",
+                              customer.name ?? "",
+                              customer.email ?? "",
+                            ],
+                            onSelected: (customer) {
+                              BlocProvider.of<CrmBloc>(context).add(SelectCustomerEvent(selectedCustomer: customer));
+                            },
+                            onChanged: (value) {
+                              BlocProvider.of<CrmBloc>(context).add(SearchCustomersEvent(searchQuery: value));
+                            },
+                            defaultText: "Search Customer",
+                            labelText: "Search Customer",
+                          ),
+                        ),
+                        Spacer(flex: 2),
+                        CustomResponsiveButton(
+                          onPressed: () => showCustomerCreationSheet(context),
+                          text: 'Create Customer',
+                          height: 40,
+                          width: 250,
+                          isFullWidth: false,
+                          elevation: 0,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(7),
+                      child: Table(
+                        border: TableBorder.all(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        children: [
+                          TableRow(
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(7), topRight: Radius.circular(7)),
+                            ),
+                            children: titles
+                                .map((e) => Container(
+                                      padding: EdgeInsets.all(8),
+                                      child: Text(
+                                        e,
+                                        style: AppStyles.getMediumTextStyle(fontSize: 14, color: Colors.white),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                          ...state.filteredCustomersList
+                              .asMap()
+                              .entries
+                              .map((customer) => TableRow(
+                                    children: titles.asMap().entries.map((e) {
+                                      return InkWell(
+                                        onHover: (value) {
+                                          setState(() {
+                                            hoveredRowIndex = value ? customer.key : null;
+                                          });
+                                        },
+                                        onTap: () => context.pushNamed(CustomerDetailsScreen.route, extra: {"data": customer.value}),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: hoveredRowIndex == customer.key ? AppColors.primaryColor.withOpacity(0.1) : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(7),
+                                          ),
+                                          padding: EdgeInsets.all(8),
+                                          child: Text(
+                                            e.key == 0
+                                                ? '${customer.key + 1}'
+                                                : e.key == 1
+                                                    ? "${customer.value.name}-${customer.value.phone}"
+                                                    : e.key == 2
+                                                        ? ""
+                                                        : "",
+                                            style: AppStyles.getMediumTextStyle(fontSize: 14, color: Colors.black),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ))
+                              .toList()
+                        ],
+                      ),
+                    )
+                  ],
                 )
               : Scaffold(
                   body: RefreshIndicator(
@@ -50,6 +166,7 @@ class _CrmScreenState extends State<CrmScreen> {
                         AutoCompleteTextField<CustomerModel>(
                           items: state.customersList,
                           controller: customerData,
+                          focusNode: customerNode,
                           displayStringFunction: (v) {
                             return v.name ?? "";
                           },
@@ -123,29 +240,6 @@ class _CrmScreenState extends State<CrmScreen> {
           ));
         }
       },
-    );
-  }
-
-  Row buildLabel(String title, String data) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-            child: Text(
-          title,
-          style: AppStyles.getRegularTextStyle(fontSize: 14),
-        )),
-        Expanded(
-            child: Text(
-          '-',
-          style: AppStyles.getRegularTextStyle(fontSize: 12),
-        )),
-        Expanded(
-            child: Text(
-          data,
-          style: AppStyles.getRegularTextStyle(fontSize: 14),
-        )),
-      ],
     );
   }
 

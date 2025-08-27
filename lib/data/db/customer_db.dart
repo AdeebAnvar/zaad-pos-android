@@ -8,7 +8,14 @@ class CustomerDb {
   static String customerBoxName = "zaad_pos_customers";
 
   static late Box customerBox;
-  static initCustomerDb() async => customerBox = await Hive.openBox(customerBoxName);
+  static initCustomerDb() async {
+    try {
+      customerBox = await Hive.openBox(customerBoxName);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   static Future<int> storeCustomer(CustomerModel customer) async {
     int customerId = await customerBox.add(customer.toJson());
     return customerId;

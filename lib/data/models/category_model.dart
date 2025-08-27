@@ -21,13 +21,13 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         id: json["id"],
-        categoryNameEng: json["category_name_eng"],
-        categoryNameArabic: json["category_name_arabic"],
+        categoryNameEng: json["name"],
+        categoryNameArabic: json["other_name"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "category_name_eng": categoryNameEng,
-        "category_name_arabic": categoryNameArabic,
+        "name": categoryNameEng,
+        "other_name": categoryNameArabic,
       };
 }

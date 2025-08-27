@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/styles.dart';
 import 'package:pos_app/data/models/customer_model.dart';
-import 'package:pos_app/presentation/screens/dashboard/customer_details.dart';
+import 'package:pos_app/presentation/screens/dashboard/counter_sale/customer_details.dart';
 
 import '../constatnts/colors.dart';
 

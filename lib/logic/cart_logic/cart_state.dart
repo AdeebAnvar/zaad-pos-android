@@ -8,10 +8,8 @@ class CartInitialState extends CartState {}
 class CartLoadingState extends CartState {}
 
 class CartLoadedState extends CartState {
-  CartModel cart;
-  CartLoadedState({
-    required this.cart,
-  });
+  CartModel? cart;
+  CartLoadedState({this.cart});
 }
 
 class UpdatedCartQuantityState extends CartState {
@@ -22,3 +20,11 @@ class UpdatedCartQuantityState extends CartState {
 }
 
 class CartSubmittedState extends CartState {}
+
+class CartProductDiscountAddedState extends CartState {
+  final double newPrice;
+
+  CartProductDiscountAddedState({required this.newPrice});
+}
+
+class CartProductDiscountRemovedState extends CartState {}

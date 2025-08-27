@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:pos_app/data/utils/extensions.dart';
+import 'package:pos_app/constatnts/colors.dart';
+import 'package:pos_app/constatnts/extenstions.dart';
+import 'package:pos_app/widgets/custom_loading.dart';
 import 'package:pos_app/widgets/custom_textfield.dart';
 
 enum FilterType { startWith, endWith, contains }
@@ -32,6 +34,7 @@ class AutoCompleteTextField<T extends Object> extends StatelessWidget {
   List<TextInputFormatter>? inputFormatters;
   List<String>? selectedItems = [];
   final String? Function(String? value)? validator;
+  double? maxHeight;
 
   final void Function(String)? onSubmitted;
   AutoCompleteTextField({
@@ -43,6 +46,7 @@ class AutoCompleteTextField<T extends Object> extends StatelessWidget {
     this.onChanged,
     this.optionsViewBuilder,
     this.searchFunction,
+    this.maxHeight,
     this.selectedItems,
     this.viewWidget,
     this.disableSearch,
@@ -127,23 +131,33 @@ class AutoCompleteTextField<T extends Object> extends StatelessWidget {
 
                       suffixIcon: InkWell(
                           onTap: () {
-                            //to handle when already selected item..then select dropdown icon ..the show list..when onchange called clear selected element
-                            focusNode.requestFocus();
-                            textEditingController.clear();
-                            if (null != onChanged) {
-                              onChanged!("");
+                            if (focusNode.hasFocus) {
+                              focusNode.unfocus();
+                            } else {
+                              //to handle when already selected item..then select dropdown icon ..the show list..when onchange called clear selected element
+                              focusNode.requestFocus();
+                              if (!textEditingController.text.isNullOrEmpty()) {
+                                textEditingController.clear();
+                                if (null != onChanged) {
+                                  onChanged!("");
+                                }
+                              }
                             }
                           },
                           child: suffixIcon ??
                               (textEditingController.text.isNullOrEmpty()
-                                  ? Icon(Icons.keyboard_arrow_down_rounded)
+                                  ?
+                                  // Transform.rotate(angle: items.isNotEmpty ? 3.14159:0,
+                                  // child:
+                                  Icon(Icons.keyboard_arrow_down_outlined)
+                                  // )
                                   : Icon(
                                       textEditingController.text.isNullOrEmpty() ? Icons.keyboard_arrow_down : Icons.clear_outlined,
-                                      color: Colors.grey.shade700,
+                                      color: AppColors.hintFontColor,
                                       size: 16,
                                     ))),
                       prefixIcon: prefixIcon, showAsUpperLabel: showAsUpperLabel,
-                      // cursorColor: ColorConst.lightFontColor,
+                      // cursorColor: AppColors.lightFontColor,
                       // style: const TextStyle(
                       //   fontSize: 15,
                       //   color: Colors.black,
@@ -181,7 +195,7 @@ class AutoCompleteTextField<T extends Object> extends StatelessWidget {
                     //     (controller??textEditingController).clear();
                     //   }:onChanged,
                     //   inputFormatters:inputFormatters,
-                    //   cursorColor: ColorConst.lightFontColor,
+                    //   cursorColor: AppColors.lightFontColor,
                     //   style: const TextStyle(
                     //     fontSize: 15,
                     //     color: Colors.black,
@@ -201,19 +215,19 @@ class AutoCompleteTextField<T extends Object> extends StatelessWidget {
                     //     ),
                     //     hintStyle: TextStyle(
                     //       color: isDarkMode(context)
-                    //           ? ColorConst.white
-                    //           : ColorConst.lightFontColor,
+                    //           ? AppColors.white
+                    //           : AppColors.lightFontColor,
                     //       fontSize: 15,
                     //       fontWeight: FontWeight.w600,
                     //     ),
                     //     enabledBorder: OutlineInputBorder(
                     //       borderSide:
-                    //       const BorderSide(color: ColorConst.lightFontColor),
+                    //       const BorderSide(color: AppColors.lightFontColor),
                     //       borderRadius: BorderRadius.circular(4),
                     //     ),
                     //     focusedBorder: OutlineInputBorder(
                     //       borderSide:
-                    //       const BorderSide(color: ColorConst.lightFontColor),
+                    //       const BorderSide(color: AppColors.lightFontColor),
                     //       borderRadius: BorderRadius.circular(4),
                     //     ),
                     //     contentPadding: const EdgeInsets.symmetric(
@@ -263,7 +277,7 @@ class AutoCompleteTextField<T extends Object> extends StatelessWidget {
                           borderRadius: BorderRadius.circular(14),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
-                              maxHeight: MediaQuery.sizeOf(context).width > 400 ? 400 : (MediaQuery.sizeOf(context).width - 5),
+                              maxHeight: maxHeight ?? (MediaQuery.sizeOf(context).height / 3.5),
                               maxWidth: constraints.biggest.width,
                             ),
                             child: ListView.builder(
@@ -273,7 +287,7 @@ class AutoCompleteTextField<T extends Object> extends StatelessWidget {
                               itemBuilder: (BuildContext context, int index) {
                                 final T option = options.elementAt(index);
                                 if ((isLoading ?? false)) {
-                                  return Container(alignment: Alignment.center, padding: const EdgeInsets.all(10), child: const CircularProgressIndicator());
+                                  return Container(alignment: Alignment.center, padding: const EdgeInsets.all(10), child: const CustomLoading());
                                 }
 
                                 return InkWell(

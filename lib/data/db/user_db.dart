@@ -10,7 +10,11 @@ class UserDb {
 
   // Initialize Hive box
   static Future<void> initUserDb() async {
-    _userBox = await Hive.openBox(userBoxName);
+    try {
+      _userBox = await Hive.openBox(userBoxName);
+    } catch (e) {
+      print(e);
+    }
   }
 
   // Store Auth Token
@@ -30,11 +34,16 @@ class UserDb {
 
   // Retrieve User
   static UserModel? getUserFromLocal() {
-    final userData = _userBox.get('user');
-    if (userData != null && userData is Map) {
-      return UserModel.fromMap(Map<String, dynamic>.from(userData));
+    try {
+      final userData = _userBox.get('user');
+      if (userData != null && userData is Map) {
+        return UserModel.fromMap(Map<String, dynamic>.from(userData));
+      }
+      return null;
+    } catch (e) {
+      print(e);
+      return null;
     }
-    return null;
   }
 
   static Future<void> clearUserDb() async => await _userBox.clear();

@@ -7,13 +7,18 @@ import 'package:pos_app/data/db/user_db.dart';
 
 class HiveDb {
   static initHive() async {
-    await Hive.initFlutter();
-    await UserDb.initUserDb();
-    await CustomerDb.initCustomerDb();
-    await OrderDb.initOrderDb();
-    await ProductDb.initProductDb();
-    await ProductDb.initProductCategoryDb();
-    await CartDb.initCartDb();
+    try {
+      await Hive.initFlutter();
+      await UserDb.initUserDb();
+      await CustomerDb.initCustomerDb();
+      await OrderDb.initOrderDb();
+      await ProductDb.initProductDb();
+      await ProductDb.initProductCategoryDb();
+      await CartDb.initCartDb();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
   }
 
   static clearDb() async {

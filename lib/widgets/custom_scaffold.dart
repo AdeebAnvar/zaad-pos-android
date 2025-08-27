@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/constatnts/colors.dart';
+import 'package:pos_app/constatnts/common_functions.dart';
+import 'package:pos_app/widgets/custom_drawer_widget.dart';
 
 class CustomScaffold extends StatefulWidget {
   const CustomScaffold({
@@ -50,9 +52,11 @@ class _CustomScaffoldState extends State<CustomScaffold> with SingleTickerProvid
       backgroundColor: AppColors.primaryColor,
       body: Row(
         children: [
+          // Menu
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isMenuOpen ? 250 : 50,
+            height: MediaQuery.sizeOf(context).height,
             color: AppColors.primaryColor,
             child: Column(
               children: [
@@ -67,13 +71,23 @@ class _CustomScaffoldState extends State<CustomScaffold> with SingleTickerProvid
                     ),
                   ),
                 ),
-                if (isMenuOpen)
+                if (isMenuOpen) ...[
                   Expanded(
                     child: ListView(
+                      shrinkWrap: true,
                       padding: const EdgeInsets.all(8),
                       children: widget.menuChildren,
                     ),
                   ),
+                  DrawerItem(
+                      title: "Logout",
+                      iconWidget: Icon(
+                        Icons.power_settings_new_sharp,
+                        color: Colors.white,
+                      ),
+                      isSelected: true,
+                      onTap: () => AppFunctions.logout(context))
+                ]
               ],
             ),
           ),
@@ -81,6 +95,7 @@ class _CustomScaffoldState extends State<CustomScaffold> with SingleTickerProvid
           /// Main Content
           Expanded(
             child: Container(
+              height: MediaQuery.sizeOf(context).height,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(7),
@@ -89,6 +104,8 @@ class _CustomScaffoldState extends State<CustomScaffold> with SingleTickerProvid
                 color: AppColors.scaffoldColor,
               ),
               child: ListView(
+                shrinkWrap: true,
+                primary: true,
                 padding: const EdgeInsets.all(16),
                 children: widget.mainChildren,
               ),

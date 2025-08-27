@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725574038389",
+    "project_id": "zaad-e8589",
+    "storage_bucket": "zaad-e8589.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725574038389:android:f5744328928667657d193c",
+        "android_client_info": {
+          "package_name": "com.example.pos_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBip9763svPsQ9OMM_WMI4ddbfSd2Nzh8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,8 +6,9 @@ abstract class CartEvent {}
 class CartInitialEvent extends CartEvent {}
 
 class AddToCartEvent extends CartEvent {
+  final bool isNewCart;
   final ProductModel product;
-  AddToCartEvent({required this.product});
+  AddToCartEvent({required this.isNewCart, required this.product});
 }
 
 class RemoveFromCartEvent extends CartEvent {
@@ -23,7 +24,21 @@ class UpdateCartQuantityEvent extends CartEvent {
 
 class ClearCartEvent extends CartEvent {}
 
-class LoadCartEvent extends CartEvent {}
+class LoadCartFromLocalEvent extends CartEvent {}
+
+class ProductDiscountEvent extends CartEvent {
+  final double discountedPrice;
+  final CartItemModel cartItemModel;
+  final bool isPercentage;
+  ProductDiscountEvent({required this.isPercentage, required this.cartItemModel, required this.discountedPrice});
+}
+
+class CartDiscountEvent extends CartEvent {
+  final double discountedPrice;
+  final CartModel cartModel;
+  final bool isPercentage;
+  CartDiscountEvent({required this.isPercentage, required this.cartModel, required this.discountedPrice});
+}
 
 class SubmitingCartEvent extends CartEvent {
   OrderModel orderModel;

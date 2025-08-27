@@ -1,12 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos_app/constatnts/app_responsive.dart';
 import 'package:pos_app/constatnts/enums.dart';
+import 'package:pos_app/constatnts/utils/user_utils.dart';
+import 'package:pos_app/data/api/urls.dart';
 import 'package:pos_app/logic/dashboard_logic.dart/dashboard_bloc.dart';
-import 'package:pos_app/presentation/screens/dashboard/crm.dart';
-import 'package:pos_app/presentation/screens/dashboard/sale_window.dart';
+import 'package:pos_app/presentation/screens/dashboard/admin/categories_screen.dart';
+import 'package:pos_app/presentation/screens/dashboard/admin/item_screen.dart';
+import 'package:pos_app/presentation/screens/dashboard/counter_sale/crm.dart';
+import 'package:pos_app/presentation/screens/dashboard/counter_sale/sale_window.dart';
 import 'package:pos_app/presentation/screens/dashboard/settings_screen.dart';
 import 'package:pos_app/widgets/custom_drawer_widget.dart';
 import 'package:pos_app/widgets/custom_scaffold.dart';
@@ -15,22 +21,19 @@ import 'package:pos_app/widgets/custom_textfield.dart';
 import '../../../../constatnts/colors.dart';
 import '../../../../constatnts/styles.dart';
 
-class DashBoardScreen extends StatefulWidget {
-  const DashBoardScreen({super.key});
+class CounterSaleDashBoardScreen extends StatefulWidget {
+  const CounterSaleDashBoardScreen({super.key});
   static String route = '/dashboard';
 
   @override
-  State<DashBoardScreen> createState() => _DashBoardScreenState();
+  State<CounterSaleDashBoardScreen> createState() => _CounterSaleDashBoardScreenState();
 }
 
-class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  bool isAnimating = false;
+class _CounterSaleDashBoardScreenState extends State<CounterSaleDashBoardScreen> {
   int selectedDrawerIndex = 2;
   final DashBoardBloc _dashBoardBloc = DashBoardBloc();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
-  final screens = [
+  final counterSalescreens = [
     Container(),
     ResponsiveWrapper(child: CrmScreen()),
     SaleWindowScreen(),
@@ -41,21 +44,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
     // ResponsiveWrapper(child: PaybackScreen()),
     ResponsiveWrapper(child: SettingsScreen()),
   ];
-
+  final adminScreens = [ItemsScreen(), CategoriesScreen()];
+  final superAdminScreen = [ItemsScreen(), CategoriesScreen()];
   final screenTitles = ['', 'CRM', 'Sale', 'Settings'];
 
   @override
   void initState() {
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    );
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
@@ -75,6 +74,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
       builder: (context, state) {
         return AppResponsive.isDesktop(context)
             ? CustomScaffold(
+                scaffoldKey: scaffoldKey,
                 menuChildren: [
                   ...drawerButtons.asMap().entries.map(
                         (e) => DrawerItem(
@@ -87,19 +87,37 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
                             if (e.key == 0 || e.key == 7) {
                               showOpeningBalanceSheet(context);
                             } else {
-                              _dashBoardBloc.add(DashbBoardChangeIndexDrawer(index: e.key!));
+                              _dashBoardBloc.add(DashbBoardChangeIndexDrawer(index: e.key));
                             }
                           },
                         ),
-                      )
+                      ),
                 ],
                 mainChildren: [
-                  Text(
-                    screenTitles[selectedDrawerIndex],
-                    style: AppStyles.getSemiBoldTextStyle(fontSize: 22),
+                  Row(
+                    children: [
+                      Text(
+                        screenTitles[selectedDrawerIndex],
+                        style: AppStyles.getSemiBoldTextStyle(fontSize: 22),
+                      ),
+                      Spacer(),
+                      Text(
+                        UserUtils.userModel?.branchName ?? "",
+                        style: AppStyles.getMediumTextStyle(fontSize: 20),
+                      ),
+                      SizedBox(width: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(7),
+                        child: Image.file(
+                          File(
+                            '${UserUtils.userModel?.localImagePath ?? ""}',
+                          ),
+                          height: 50,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 16),
-                  screens[selectedDrawerIndex]
+                  counterSalescreens[selectedDrawerIndex]
                 ],
               )
             : Scaffold(
@@ -122,7 +140,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
                 drawer: CustomDrawerWidget(
                   index: selectedDrawerIndex,
                   onClick: (i) {
-                    context.pop();
+                    // context.pop();
+                    scaffoldKey.currentState?.closeDrawer();
                     if (i == 0 || i == 7) {
                       showOpeningBalanceSheet(context);
                     } else {
@@ -137,7 +156,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> with SingleTickerProv
                         horizontal: isMobile ? 8.0 : 16.0,
                         vertical: isMobile ? 8.0 : 12.0,
                       ),
-                      child: AnimatedContainer(duration: const Duration(milliseconds: 300), child: screens[selectedDrawerIndex]),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        child: counterSalescreens[selectedDrawerIndex],
+                      ),
                     );
                   },
                 ),

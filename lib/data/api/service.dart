@@ -12,7 +12,7 @@ class ApiService {
     print(apiUrl);
     try {
       final response = await _dio.get(
-        apiUrl,
+        Urls.baseUrl + url,
         queryParameters: queryParams,
         options: Options(headers: Urls.getHeaders()),
       );
@@ -85,13 +85,15 @@ class ApiService {
   static Future<ResponseModel> postApiData(String url, dynamic body) async {
     try {
       final response = await _dio.post(
-        url,
+        Urls.baseUrl + url,
         data: body,
         options: Options(headers: Urls.getHeaders()),
       );
       print(url);
       print(body);
-      print(response.statusCode);
+      print("fiognewwior ${url}");
+      print("fiognewwior ${response.statusMessage}");
+      print("fiognewwior ${response.statusCode}");
       if (response.statusCode == 200) {
         final jsonObject = response.data as Map<String, dynamic>;
         final bool isSuccess = jsonObject['status'];
@@ -163,7 +165,7 @@ class ApiService {
   static Future<ResponseModel> putApiData(String url, dynamic body) async {
     try {
       final response = await _dio.put(
-        url,
+        Urls.baseUrl + url,
         data: body,
         options: Options(headers: Urls.getHeaders()),
       );
@@ -236,7 +238,7 @@ class ApiService {
   static Future<ResponseModel> getFileApi(String url, dynamic body) async {
     try {
       final response = await _dio.post(
-        url,
+        Urls.baseUrl + url,
         data: body,
         options: Options(
           headers: Urls.getHeaders(),
@@ -314,12 +316,12 @@ class Client {
           return handler.next(options);
         },
         onError: (DioException e, handler) async {
-          print(e.message);
+          print('###############${e.message}');
           if (e.type == DioExceptionType.connectionError) {
             print(e.message);
             final response = Response(
               requestOptions: e.requestOptions,
-              data: {"success": false, "message": "No internet connection"},
+              data: {"status": false, "message": "No internet connection"},
               statusCode: 101,
             );
 
@@ -328,7 +330,7 @@ class Client {
           } else if (e.type == DioExceptionType.badResponse) {
             final response = Response(
               requestOptions: e.requestOptions,
-              data: {"success": false, "message": "Bad response"},
+              data: {"status": false, "message": "Bad response"},
               statusCode: 101,
             );
 

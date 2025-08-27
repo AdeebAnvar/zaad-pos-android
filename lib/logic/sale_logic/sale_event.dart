@@ -3,18 +3,25 @@ part of "sale_bloc.dart";
 
 abstract class SaleEvent {}
 
-class LoadProductsEvent extends SaleEvent {}
+class LoadProductsEvent extends SaleEvent {
+  final String productName;
+  LoadProductsEvent({
+    required this.productName,
+  });
+}
 
 class SearchProductsEvent extends SaleEvent {
-  String productName;
+  final String productName;
   SearchProductsEvent({
     required this.productName,
   });
 }
 
 class ChangeProductByCategoryEvent extends SaleEvent {
-  int id;
+  final int id;
   ChangeProductByCategoryEvent({
     required this.id,
   });
 }
+
+class ClearSearchEvent extends SaleEvent {}

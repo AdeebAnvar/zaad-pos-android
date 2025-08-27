@@ -5,7 +5,13 @@ import 'package:pos_app/data/models/orders_model.dart';
 class OrderDb {
   static String orderBoxName = "zaad_pos_order";
   static late Box orderBox;
-  static initOrderDb() async => orderBox = await Hive.openBox(orderBoxName);
+  static initOrderDb() async {
+    try {
+      orderBox = await Hive.openBox(orderBoxName);
+    } catch (e) {
+      print(e);
+    }
+  }
 
   static Map<String, dynamic> _convertToStringDynamicMap(Map map) {
     return map.map((key, value) {
